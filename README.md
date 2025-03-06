@@ -27,3 +27,4 @@ schema: http://techaso.ddns.net/api/schema/redoc/
 ### Create a new app 
 - Below is the command to create a new app with our custom template
 - `python manage.py generate_app <app_name>`
+git p
