@@ -15,8 +15,8 @@ class Command(BaseCommand):
 
         # Define paths
         project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../'))  # Go up to `erp_backend`
-        template_path = os.path.join(project_root, "biller", "app_template")  # Your app template
-        destination_path = os.path.join(project_root, "biller_apps", app_name)  # Where new apps will be created
+        template_path = os.path.join(project_root, "remedizz", "app_template")  # Your app template
+        destination_path = os.path.join(project_root, "remedizz_apps", app_name)  # Where new apps will be created
 
         # Check if the app already exists
         if os.path.exists(destination_path):
