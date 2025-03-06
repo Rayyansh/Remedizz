@@ -1,7 +1,3 @@
-# Backend for biller
-
-schema: http://techaso.ddns.net/api/schema/redoc/
-
 ## Contribution rules
 ### Naming
 - Variables : all lower case. eg: `lower_case_variable`
