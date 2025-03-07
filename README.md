@@ -1,4 +1,8 @@
 ## Contribution rules
+
+## Database
+
+
 ### Naming
 - Variables : all lower case. eg: `lower_case_variable`
 - Constants : all caps. eg: `INSTALLED_APPS`
