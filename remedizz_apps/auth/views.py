@@ -1,6 +1,5 @@
 import json
 
-
 from django.core.paginator import Paginator
 
 from rest_framework import status
@@ -18,7 +17,6 @@ from biller_apps.common.dataclasses.get_all import GetAll
 from biller_apps.common.dataclasses.search import Search
 from biller_apps.common.publish import Publish
 from biller_apps.common.utils import Utils
-
 
 
 class AppTemplateView:
@@ -76,9 +74,9 @@ class AppTemplateView:
     @Common().exception_handler
     def search_extract(self, params: Search, token_payload: Payload):
         data, total_pages, total_count = AppTemplateEsQuery().search_pattern_start_with_query(request_keys=params.key,
-                                                                                        organisation_id=token_payload.organisation_id,
-                                                                                        limit=params.limit,
-                                                                                        page_num=params.page_num)
+                                                                                              organisation_id=token_payload.organisation_id,
+                                                                                              limit=params.limit,
+                                                                                              page_num=params.page_num)
         data = Utils.add_page_parameter(final_data=data, page_num=params.page_num,
                                         present_url=token_payload.present_url, total_page=total_pages,
                                         total_count=total_count,

@@ -5,6 +5,5 @@ from biller_apps.app_template.dataclasses.request.create import AppTemplateReque
 
 class AppTemplateRequestSerializer(serializers.Serializer):
 
-
     def create(self, validated_data) -> AppTemplateRequest:
         return AppTemplateRequest(**validated_data)
