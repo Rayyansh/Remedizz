@@ -11,3 +11,5 @@ urlpatterns = [
     path('search/', AppTemplateViewController.search, name='app_template_search'),
 
 ]
+
+
