@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from remedizz_apps.user.serializers import UserAuthSerializer, OTPVerifySerializer
+from remedizz_apps.user.serializers import UserAuthSerializer, OTPVerifySerializer, UserAuthResponseSerializer
 from remedizz_apps.user.views import UserAuthView, DoctorOnlyView, PatientOnlyView, DigitalClinicOnlyView
 from remedizz_apps.user.permissions import IsDoctor, IsPatient, IsDigitalClinic
 from remedizz_apps.common.swagger import SwaggerPage
@@ -22,7 +22,7 @@ class AuthController:
     @extend_schema(
         description="Verify OTP and log in the user",
         request=OTPVerifySerializer,
-        responses=SwaggerPage.response(description="User logged in successfully.")
+        responses=SwaggerPage.response(response=UserAuthResponseSerializer)
     )
     @api_view(['POST'])
     def verify_otp(request: Request) -> Response:
