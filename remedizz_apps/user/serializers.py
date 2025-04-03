@@ -4,15 +4,12 @@ from rest_framework import serializers
 from remedizz_apps.user.models import User
 
 class UserAuthSerializer(serializers.Serializer):
-
-    ROLE_CHOICES = (
-        ('doctor', 'Doctor'),
-        ('patient', 'Patient'),
-        ('digital_clinic', 'Digital Clinic'),
-    )
     username = serializers.CharField(required=True)
     phone_number = serializers.CharField(required=True)
-    role = serializers.ChoiceField(choices=ROLE_CHOICES)
+    role = serializers.ChoiceField(
+        choices=['Doctor', 'Patient', 'DigitalClinic'],
+        help_text="Role of the user. Possible values: Doctor, Patient, DigitalClinic."
+    )
 
     def validate(self, data):
         if not all([data.get('username'), data.get('phone_number'), data.get('role')]):

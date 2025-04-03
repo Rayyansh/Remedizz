@@ -1,4 +1,5 @@
 from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone
@@ -9,8 +10,13 @@ from remedizz_apps.user.serializers import UserAuthResponseSerializer
 from remedizz_apps.user.utils import send_otp_sms
 from remedizz_apps.user.utils import generate_jwt_token
 from remedizz_apps.user.permissions import IsDoctor, IsPatient, IsDigitalClinic, IsAuthenticatedUser
+from remedizz_apps.patients.models import Patient
+from remedizz_apps.doctors.models import Doctor
+from remedizz_apps.clinics.models import DigitalClinic
+from django.db import transaction
 
 class UserAuthView(APIView):
+    permission_classes = [AllowAny]
 
     def auth_process(self, params):
         serializer = UserAuthSerializer(data=params)
@@ -20,17 +26,35 @@ class UserAuthView(APIView):
         username = params.get('username')
         phone_number = params.get('phone_number')
         role = params.get('role')
-        
-        user, created = User.objects.get_or_create(username=username, phone_number=phone_number, role=role)
-        
-        otp = default_token_generator.make_token(user)[:6]
-        user.otp = otp
-        user.otp_expiry = timezone.now() + timezone.timedelta(minutes=5)
-        user.save()
-        
-        send_otp_sms(phone_number, otp)
-        
-        return Response({"message": "OTP sent successfully."}, status=status.HTTP_200_OK)
+
+        try:
+            with transaction.atomic():
+                user, created = User.objects.get_or_create(username=username, phone_number=phone_number, role=role)
+                
+                # Create corresponding object
+                if created:
+                    if role == "Patient":
+                        Patient.objects.create(patient_id=user)
+                    elif role == "Doctor":
+                        Doctor.objects.create(doctor_id=user)
+                    elif role == "DigitalClinic":
+                        DigitalClinic.objects.create(digital_clinic_id=user)
+                    else:
+                        return Response({"error": "Invalid role provided."}, status=status.HTTP_400_BAD_REQUEST)
+
+                # Generate OTP
+                otp = default_token_generator.make_token(user)[:6]
+                user.otp = otp
+                user.otp_expiry = timezone.now() + timezone.timedelta(minutes=5)
+                user.save()
+
+                # Send OTP
+                send_otp_sms(phone_number, otp)
+
+                return Response({"message": "OTP sent successfully.", "OTP":{otp}}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def verify_otp(self, params):
         serializer = OTPVerifySerializer(data=params)
@@ -54,21 +78,3 @@ class UserAuthView(APIView):
         response_data["token"] = token
         
         return Response(response_data, status=status.HTTP_200_OK)
-
-class DoctorOnlyView(APIView):
-    permission_classes = [IsDoctor]
-    
-    def get(self, request):
-        return Response({"message": "Welcome, Doctor!"}, status=status.HTTP_200_OK)
-
-class PatientOnlyView(APIView):
-    permission_classes = [IsPatient]
-    
-    def get(self, request):
-        return Response({"message": "Welcome, Patient!"}, status=status.HTTP_200_OK)
-
-class DigitalClinicOnlyView(APIView):
-    permission_classes = [IsDigitalClinic]
-    
-    def get(self, request):
-        return Response({"message": "Welcome, Digital Clinic!"}, status=status.HTTP_200_OK)
