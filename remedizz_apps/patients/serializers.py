@@ -14,7 +14,8 @@ class PatientResponseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Patient
-        fields = ["patient_id", "date_of_birth", "address", "record", "prescription", "reports", "created_at", "updated_at"]
+        fields = ["patient_id", "date_of_birth", "address", "record", "prescription", "reports", "created_at",
+                  "updated_at"]
 
 
 class PatientListSerializer(serializers.ModelSerializer):
@@ -23,7 +24,6 @@ class PatientListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Patient
         fields = ["patient_id", "date_of_birth", "address"]
-
 
 
 class PatientRequestSerializer(serializers.Serializer):
@@ -44,4 +44,5 @@ class PatientResponseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Patient
-        fields = ['patient_id', 'date_of_birth', 'address', 'record', 'prescription', 'reports', 'created_at', 'updated_at']
+        fields = ['patient_id', 'date_of_birth', 'address', 'record', 'prescription', 'reports', 'created_at',
+                  'updated_at']

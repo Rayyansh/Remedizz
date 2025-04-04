@@ -11,20 +11,22 @@ class Doctor(models.Model):
     ])
     gender = models.CharField(max_length=10, choices=[("Male", "Male"), ("Female", "Female"), ("Other", "Other")])
     city = models.CharField(max_length=20)
-    doctor_contact_number = models.CharField(max_length=15 , null=True, blank=True)
-    doctor_email = models.EmailField(max_length=30 , null=True, blank=True)
-    doctor_profile_picture = models.ImageField(upload_to="doctor_profile_pictures/", null=True, blank=True, max_length=30)
+    doctor_contact_number = models.CharField(max_length=15, null=True, blank=True)
+    doctor_email = models.EmailField(max_length=30, null=True, blank=True)
+    doctor_profile_picture = models.ImageField(upload_to="doctor_profile_pictures/", null=True, blank=True,
+                                               max_length=30)
     education = models.ForeignKey('Education', on_delete=models.CASCADE, related_name="doctor_education", null=True)
-    work_experience = models.ForeignKey('WorkExperience', on_delete=models.CASCADE, related_name="doctor_experience", null=True)
+    work_experience = models.ForeignKey('WorkExperience', on_delete=models.CASCADE, related_name="doctor_experience",
+                                        null=True)
 
     # Preferences
     preferred_language = models.CharField(max_length=15)
     terms_and_conditions_accepted = models.BooleanField(default=False)
 
     # registration information
-    registration_number = models.CharField(max_length=50 , null=True, blank=True)
+    registration_number = models.CharField(max_length=50, null=True, blank=True)
     registration_year = models.DateField(null=True)
-    registration_council = models.CharField(max_length=50 , null=True, blank=True)
+    registration_council = models.CharField(max_length=50, null=True, blank=True)
 
     class Meta:
         db_table = 'doctor'
@@ -32,10 +34,12 @@ class Doctor(models.Model):
     def __str__(self):
         return self.doctor_id.username
 
+
 class Education(models.Model):
     qualification = models.CharField(max_length=50)
     college_name = models.CharField(max_length=50)
     college_passing_year = models.DateField()
+
 
 class WorkExperience(models.Model):
     job_profile = models.CharField(max_length=50)
@@ -57,6 +61,3 @@ class DoctorSchedule(models.Model):
 
     def __str__(self):
         return f"{self.doctor.doctor_id} - {self.appointment_date} - {self.slot}"
-
-
-
