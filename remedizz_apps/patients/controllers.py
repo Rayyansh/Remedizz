@@ -10,8 +10,9 @@ from remedizz_apps.patients.views import PatientView
 from remedizz_apps.patients.serializers import PatientRequestSerializer, PatientResponseSerializer
 from remedizz_apps.common.swagger import SwaggerPage
 
+
 class PatientController:
-    
+
     @extend_schema(
         description="Retrieve a single patient or all patients",
         responses=SwaggerPage.response(response=PatientResponseSerializer)
@@ -20,7 +21,7 @@ class PatientController:
     @permission_classes([IsPatient])
     def get_patient(request: Request, patient_id=None) -> Response:
         return PatientView().get(request, patient_id)
-    
+
     @extend_schema(
         description="Update patient profile",
         request=PatientRequestSerializer,
@@ -29,7 +30,7 @@ class PatientController:
     @api_view(['PUT'])
     def update_patient(request: Request, patient_id) -> Response:
         return PatientView().put(request, patient_id=patient_id)
-    
+
     @extend_schema(
         description="Delete patient profile",
         responses=SwaggerPage.response(description="Patient deleted successfully.")
