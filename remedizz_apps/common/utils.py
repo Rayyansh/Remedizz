@@ -5,6 +5,7 @@ from rest_framework.response import Response
 
 from remedizz.config import Configurations
 from remedizz.constants import Constants
+from typing import Union
 
 
 class Utils:
@@ -13,7 +14,7 @@ class Utils:
         self.validation_error = Constants.validation_error
 
     @staticmethod
-    def success_response_data(message, data: list | dict = None, image=False):
+    def success_response_data(message, data: Union[list, dict] = None, image=False):
         if image:
             return message
         if data is None and message is None:
