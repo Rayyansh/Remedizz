@@ -33,6 +33,25 @@ class Doctor(models.Model):
 
     def __str__(self):
         return self.doctor_id.username
+    
+
+
+    @staticmethod
+    def get_doctor_by_id(doctor_id):
+        return Doctor.objects.filter(doctor_id=doctor_id).first()
+    
+    
+    @staticmethod
+    def get_all_doctors():
+        return Doctor.objects.all()
+    
+    @staticmethod
+    def update_doctor(doctor_id, **kwargs):
+        return Doctor.objects.filter(id=doctor_id).update(**kwargs)
+    
+    @staticmethod
+    def delete_doctor(doctor_id):
+        return Doctor.objects.filter(id=doctor_id).first()
 
 
 class Education(models.Model):
