@@ -3,7 +3,7 @@ from rest_framework.permissions import BasePermission
 
 class IsDoctor(BasePermission):
     def has_permission(self, request, view):
-        return request.user and request.role == 'doctor'
+        return request.user and getattr(request.user, "role", None) == "Doctor"
 
 
 class IsPatient(BasePermission):

@@ -4,6 +4,7 @@ from remedizz_apps.user.models import User
 
 class DigitalClinic(models.Model):
     digital_clinic_id = models.OneToOneField(User, on_delete=models.CASCADE, related_name="clinic_profile")
+    services = models.ManyToManyField('DigitalClinicService', blank=True, related_name="clinics")
     name = models.CharField(max_length=30)
     clinic_type = models.CharField(max_length=30)
     address = models.TextField()
@@ -17,31 +18,133 @@ class DigitalClinic(models.Model):
         return self.digital_clinic_id.username
 
 
+    @staticmethod
+    def get_clinic_by_id(clinic_id):
+        return DigitalClinic.objects.filter(digital_clinic_id=clinic_id).first()
+    
+    @staticmethod
+    def get_all_clinics():
+        return DigitalClinic.objects.all()
+    
+    @staticmethod
+    def update_clinic(clinic_id, **kwargs):
+        return DigitalClinic.objects.filter(digital_clinic_id=clinic_id).update(**kwargs)
+    
+
+    @staticmethod
+    def create_clinic(clinic_id, **kwargs):
+        clinic = DigitalClinic.objects.create(digital_clinic_id=clinic_id, **kwargs)
+        return clinic
+    
+    @staticmethod
+    def delete_clinic(clinic_id):
+        return DigitalClinic.objects.filter(digital_clinic_id=clinic_id).delete()
+    
 class DigitalClinicService(models.Model):
-    clinic = models.ForeignKey(DigitalClinic, on_delete=models.CASCADE, related_name="services")
+   
     specialization_offered = models.CharField(max_length=20)
     available_service = models.TextField()  # Can store multiple services as a comma-separated list
     operating_hours = models.CharField(max_length=20)  # Example: "9 AM - 6 PM"
 
     def __str__(self):
         return f"{self.clinic.name} - {self.specialization_offered}"
+    
+    @staticmethod
+    def get_services_by_clinic(clinic_id):
+        return DigitalClinicService.objects.filter(clinic_id=clinic_id)
+    
+    @staticmethod
+    def get_service_by_id(service_id):
+        return DigitalClinicService.objects.filter(id=service_id).first()
+    
+    @staticmethod
+    def update_service(service_id, **kwargs):
+        return DigitalClinicService.objects.filter(id=service_id).update(**kwargs)
+    
+    @staticmethod
+    def create_service(clinic_id, **kwargs):
+        service = DigitalClinicService.objects.create(clinic_id=clinic_id, **kwargs)
+        return service
+    
+    @staticmethod
+    def delete_service(service_id):
+        return DigitalClinicService.objects.filter(id=service_id).delete()
 
 
-class DigitalClinicMedicalRecords(models.Model):
-    digital_clinic_name = models.ForeignKey(DigitalClinic, on_delete=models.CASCADE, related_name="medical_records")
-    digital_lab_certificates = models.FileField(upload_to="digital_lab_certificates/", null=True, blank=True)
-    digital_clinic_pharmacy_licence = models.FileField(upload_to="digital_clinic_pharmacy_licence/", null=True,
-                                                       blank=True)
 
-    def __str__(self):
-        return self.digital_clinic_name.name
+# class DigitalClinicMedicalRecords(models.Model):
+#     digital_clinic_name = models.ForeignKey(DigitalClinic, on_delete=models.CASCADE, related_name="medical_records")
+#     digital_lab_certificates = models.FileField(upload_to="digital_lab_certificates/", null=True, blank=True)
+#     digital_clinic_pharmacy_licence = models.FileField(upload_to="digital_clinic_pharmacy_licence/", null=True,
+#                                                        blank=True)
+
+#     def __str__(self):
+#         return self.digital_clinic_name.name
+    
+
+#     @staticmethod
+#     def get_medical_records_by_clinic(clinic_id):
+#         return DigitalClinicMedicalRecords.objects.filter(digital_clinic_name_id=clinic_id).first()
+    
+#     @staticmethod
+#     def update_medical_records(clinic_id, **kwargs):
+#         return DigitalClinicMedicalRecords.objects.filter(digital_clinic_name_id=clinic_id).update(**kwargs)
+    
+#     @staticmethod
+#     def create_medical_records(clinic_id, **kwargs):
+#         records = DigitalClinicMedicalRecords.objects.create(digital_clinic_name_id=clinic_id, **kwargs)
+#         return records
+    
+#     @staticmethod
+#     def delete_medical_records(clinic_id):
+#         return DigitalClinicMedicalRecords.objects.filter(digital_clinic_name_id=clinic_id).delete()
+    
+    
 
 
-class DigitalClinicPaymentInformation(models.Model):
-    Digital_clinic_name = models.ForeignKey(DigitalClinic, on_delete=models.CASCADE, related_name="payment_information")
-    Digital_clinic_bank_account_number = models.CharField(max_length=20)
-    ifsc_code = models.CharField(max_length=10)
-    uoi_id = models.CharField(max_length=10)
+# class DigitalClinicPaymentInformation(models.Model):
+#     Digital_clinic_name = models.ForeignKey(DigitalClinic, on_delete=models.CASCADE, related_name="payment_information")
+#     Digital_clinic_bank_account_number = models.CharField(max_length=20)
+#     ifsc_code = models.CharField(max_length=10)
+#     uoi_id = models.CharField(max_length=10)
 
-    def __str__(self):
-        return self.Digital_clinic_name.name
+#     def __str__(self):
+#         return self.Digital_clinic_name.name
+    
+#     @staticmethod
+#     def get_payment_info_by_clinic(clinic_id):
+#         return DigitalClinicPaymentInformation.objects.filter(Digital_clinic_name_id=clinic_id).first()
+    
+#     @staticmethod
+#     def update_payment_info(clinic_id, **kwargs):
+#         return DigitalClinicPaymentInformation.objects.filter(Digital_clinic_name_id=clinic_id).update(**kwargs)
+    
+#     @staticmethod
+#     def create_payment_info_by_id(payment_id, **kwargs):
+#       return DigitalClinicPaymentInformation.objects.create(id=payment_id, **kwargs)
+
+   
+
+#     @staticmethod
+#     def delete_payment_info(clinic_id):
+#         return DigitalClinicPaymentInformation.objects.filter(Digital_clinic_name_id=clinic_id).delete()
+
+#     @staticmethod
+#     def get_payment_info_by_id(payment_id):
+#         return DigitalClinicPaymentInformation.objects.filter(id=payment_id).first()
+    
+#     @staticmethod
+#     def update_payment_info_by_id(payment_id, **kwargs):
+#         return DigitalClinicPaymentInformation.objects.filter(id=payment_id).update(**kwargs)
+    
+#     @staticmethod
+#     def create_payment_info_by_id(payment_id, **kwargs):
+#         payment_info = DigitalClinicPaymentInformation.objects.create(id=payment_id, **kwargs)
+#         return payment_info
+    
+#     @staticmethod
+#     def delete_payment_info_by_id(payment_id):
+#         return DigitalClinicPaymentInformation.objects.filter(id=payment_id).delete()
+    
+    
+    

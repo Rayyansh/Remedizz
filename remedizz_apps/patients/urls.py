@@ -7,3 +7,5 @@ urlpatterns = [
     path('update/<int:patient_id>/', PatientController.update_patient, name='update_patient'),
     path('delete/<int:patient_id>/', PatientController.delete_patient, name='delete_patient'),
 ]
+
+
