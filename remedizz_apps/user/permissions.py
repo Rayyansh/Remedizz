@@ -1,4 +1,5 @@
 from rest_framework.permissions import BasePermission
+from remedizz_apps.clinics.models import *
 
 
 class IsDoctor(BasePermission):
@@ -13,7 +14,7 @@ class IsPatient(BasePermission):
 
 class IsDigitalClinic(BasePermission):
     def has_permission(self, request, view):
-        return request.user and request.role == 'digital_clinic'
+        return request.user and request.role == 'DigitalClinic'
 
 
 class IsAuthenticatedUser(BasePermission):

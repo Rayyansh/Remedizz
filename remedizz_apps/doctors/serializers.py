@@ -22,41 +22,6 @@ class DoctorScheduleSerializer(serializers.ModelSerializer):
 
 # =========================================================================================================
 
-class DoctorResponseSerializer(serializers.ModelSerializer):
-    doctor_id = serializers.IntegerField(source='id', read_only=True)
-    education = EducationSerializer()
-    work_experience = WorkExperienceSerializer()
-    schedules = DoctorScheduleSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Doctor
-        fields = [
-            "doctor_id", "name", "specialization", "gender", "city", "doctor_contact_number",
-            "doctor_email", "doctor_profile_picture", "education", "work_experience",
-            "preferred_language", "terms_and_conditions_accepted", "registration_number",
-            "registration_year", "registration_council", "schedules"
-        ]
-
-
-class DoctorUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Doctor
-        fields = [
-            "specialization", "gender", "city", "doctor_contact_number",
-            "doctor_email", "doctor_profile_picture", "education",
-            "work_experience", "preferred_language",
-            "terms_and_conditions_accepted", "registration_number",
-            "registration_year", "registration_council"
-        ]
-
-
-class DoctorListSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Doctor
-        fields = ["specialization", "city"]
-
-
 class DoctorRequestSerializer(serializers.ModelSerializer):
     education = EducationSerializer()
     work_experience = WorkExperienceSerializer()
@@ -76,12 +41,10 @@ class DoctorRequestSerializer(serializers.ModelSerializer):
         work_experience_data = validated_data.pop("work_experience", None)
         schedules_data = validated_data.pop("schedules", None)
 
-        # Update simple Doctor fields
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
 
-        # Handle education
         if education_data:
             if instance.education:
                 for attr, value in education_data.items():
@@ -92,7 +55,6 @@ class DoctorRequestSerializer(serializers.ModelSerializer):
                 instance.education = education
                 instance.save()
 
-        # Handle work experience
         if work_experience_data:
             if instance.work_experience:
                 for attr, value in work_experience_data.items():
@@ -103,14 +65,35 @@ class DoctorRequestSerializer(serializers.ModelSerializer):
                 instance.work_experience = work_experience
                 instance.save()
 
-        # Handle schedules
         if schedules_data is not None:
             instance.schedules.all().delete()
             for schedule in schedules_data:
                 DoctorSchedule.objects.create(doctor=instance, **schedule)
 
         return instance
+    
+class DoctorResponseSerializer(serializers.ModelSerializer):
+    doctor_id = serializers.IntegerField(source='id', read_only=True)
+    education = EducationSerializer()
+    work_experience = WorkExperienceSerializer()
+    schedules = DoctorScheduleSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Doctor
+        fields = [
+            "doctor_id", "specialization", "gender", "city", "doctor_contact_number",
+            "doctor_email", "doctor_profile_picture", "education", "work_experience",
+            "preferred_language", "terms_and_conditions_accepted", "registration_number",
+            "registration_year", "registration_council", "schedules"
+        ]
 
 
 
+# ============================================================================================================
 
+class DoctorSearchSerializer(serializers.ModelSerializer):
+    doctor_name = serializers.CharField(source='doctor_id.username', read_only=True)
+
+    class Meta:
+        model = Doctor
+        fields = ['doctor_name', 'specialization']

@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from drf_spectacular.utils import extend_schema
 
-from remedizz_apps.doctors.views import DoctorView
-from remedizz_apps.doctors.serializers import DoctorRequestSerializer, DoctorResponseSerializer
+from remedizz_apps.doctors.views import *
+from remedizz_apps.doctors.serializers import *
 from remedizz_apps.common.swagger import SwaggerPage
 from remedizz_apps.user.permissions import IsDoctor
 
@@ -55,3 +55,18 @@ class DoctorController:
     @permission_classes([IsAuthenticated, IsDoctor])
     def update_doctor(request: Request, doctor_id: int) -> Response:
         return DoctorView().put(request, doctor_id)
+    
+
+# =================================================================================
+
+    
+    @staticmethod
+    @extend_schema(
+        description="Search doctors by doctor name or specialization.",
+        responses=SwaggerPage.response(response=DoctorSearchSerializer)
+    )
+    @api_view(['GET'])
+    @permission_classes([IsAuthenticated])
+    def search_doctors(request: Request) -> Response:
+        return DoctorSearchView().search(request)
+
