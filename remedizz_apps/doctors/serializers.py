@@ -31,7 +31,7 @@ class DoctorResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Doctor
         fields = [
-            "doctor_id", "specialization", "gender", "city", "doctor_contact_number",
+            "doctor_id", "name", "specialization", "gender", "city", "doctor_contact_number",
             "doctor_email", "doctor_profile_picture", "education", "work_experience",
             "preferred_language", "terms_and_conditions_accepted", "registration_number",
             "registration_year", "registration_council", "schedules"
@@ -51,11 +51,10 @@ class DoctorUpdateSerializer(serializers.ModelSerializer):
 
 
 class DoctorListSerializer(serializers.ModelSerializer):
-    doctor_id = serializers.CharField(source="doctor_id.username")
 
     class Meta:
         model = Doctor
-        fields = ["doctor_id", "specialization", "city"]
+        fields = ["specialization", "city"]
 
 
 class DoctorRequestSerializer(serializers.ModelSerializer):

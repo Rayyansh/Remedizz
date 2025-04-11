@@ -1,9 +1,22 @@
 from django.db import models
 from remedizz_apps.user.models import User
-
+from django.contrib.auth.validators import UnicodeUsernameValidator
 
 class Doctor(models.Model):
     doctor_id = models.OneToOneField(User, on_delete=models.CASCADE, related_name="doctor_profile")
+    username_validator = UnicodeUsernameValidator()
+    name = models.CharField(("username"),
+        max_length=20,
+        unique=True,
+        help_text=(
+            "Required. 20 characters or fewer. Letters, digits and @/./+/-/_ only."
+        ),
+        validators=[username_validator],
+        error_messages={
+            "unique": ("A user with that username already exists."),
+        },
+        null=True
+    )
     specialization = models.CharField(max_length=20, choices=[
         ("Cardiologist", "Cardiologist"),
         ("Dermatologist", "Dermatologist"),
@@ -32,7 +45,8 @@ class Doctor(models.Model):
         db_table = 'doctor'
 
     def __str__(self):
-        return self.doctor_id.username
+        return self.name
+
     
 
 
