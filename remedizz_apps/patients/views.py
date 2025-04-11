@@ -3,8 +3,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
-from remedizz_apps.patients.models import Patient
-from remedizz_apps.patients.serializers import PatientRequestSerializer, PatientResponseSerializer
+from remedizz_apps.patients.models import Patient, ChildPatient
+from remedizz_apps.patients.serializers.request.patient_create import PatientRequestSerializer
+from remedizz_apps.patients.serializers.response.patient_get_all import PatientResponseSerializer
+from remedizz_apps.patients.serializers.request.child_patient_create import ChildPatientRequestSerializer
+from remedizz_apps.patients.serializers.response.child_patient_get_all import ChildPatientResponseSerializer
 from remedizz_apps.common.common import Common
 from remedizz_apps.user.permissions import IsPatient
 
@@ -51,3 +54,55 @@ class PatientView(APIView):
 
         patient.delete()
         return Response({"message": "Patient deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
+
+class ChildPatientView(APIView):
+    permission_classes = [IsAuthenticated, IsPatient]
+
+    @Common().exception_handler
+    def post(self, request):
+        parent = request.user.patient_profile
+        serializer = ChildPatientRequestSerializer(data=request.data)
+        if serializer.is_valid():
+            ChildPatient.objects.create(parent=parent, **serializer.validated_data)
+            return Response({"message": "Child patient created successfully."}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @Common().exception_handler
+    def get(self, request, child_id=None):
+        parent = request.user.patient_profile
+        if child_id:
+            child = ChildPatient.get_by_id(child_id, parent)
+            if not child:
+                return Response({"error": "Child patient not found."}, status=status.HTTP_404_NOT_FOUND)
+            serializer = ChildPatientResponseSerializer(child)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        children = ChildPatient.get_all_by_parent(parent)
+        serializer = ChildPatientResponseSerializer(children, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @Common().exception_handler
+    def put(self, request, child_id):
+        parent = request.user.patient_profile
+        child = ChildPatient.get_by_id(child_id, parent)
+        if not child:
+            return Response({"error": "Child patient not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ChildPatientRequestSerializer(child, data=request.data, partial=True)
+        if serializer.is_valid():
+            for attr, value in serializer.validated_data.items():
+                setattr(child, attr, value)
+            child.save()
+            return Response(ChildPatientResponseSerializer(child).data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @Common().exception_handler
+    def delete(self, request, child_id):
+        parent = request.user.patient_profile
+        child = ChildPatient.get_by_id(child_id, parent)
+        if not child:
+            return Response({"error": "Child patient not found."}, status=status.HTTP_404_NOT_FOUND)
+        child.delete()
+        return Response({"message": "Child patient deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
