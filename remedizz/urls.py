@@ -6,7 +6,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('remedizz_apps.user.urls')),
     path('patients/', include('remedizz_apps.patients.urls')),
-    path('clinics/', include('remedizz_apps.clinics.urls')),
     path('doctors/', include('remedizz_apps.doctors.urls')),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),

@@ -10,11 +10,10 @@ class PatientUpdateSerializer(serializers.ModelSerializer):
 
 
 class PatientResponseSerializer(serializers.ModelSerializer):
-    patient_id = serializers.CharField(source="patient_id.username")
 
     class Meta:
         model = Patient
-        fields = ["patient_id", "date_of_birth", "address", "record", "prescription", "reports", "created_at",
+        fields = ["patient_id", "name", "date_of_birth", "address", "record", "prescription", "reports", "created_at",
                   "updated_at"]
 
 
@@ -27,22 +26,19 @@ class PatientListSerializer(serializers.ModelSerializer):
 
 
 class PatientRequestSerializer(serializers.Serializer):
-    patient_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(role='patient'))
+    name = serializers.CharField()
     date_of_birth = serializers.DateField()
     address = serializers.CharField()
     record = serializers.FileField(required=False, allow_null=True)
     prescription = serializers.FileField(required=False, allow_null=True)
     reports = serializers.FileField(required=False, allow_null=True)
 
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
+
     def validate(self, data):
         # Additional custom validation if needed
         return data
-
-
-class PatientResponseSerializer(serializers.ModelSerializer):
-    patient_id = serializers.CharField(source='patient_id.username')
-
-    class Meta:
-        model = Patient
-        fields = ['patient_id', 'date_of_birth', 'address', 'record', 'prescription', 'reports', 'created_at',
-                  'updated_at']

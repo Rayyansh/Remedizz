@@ -30,15 +30,24 @@ class UserAuthView(APIView):
         try:
             with transaction.atomic():
                 user, created = User.objects.get_or_create(username=username, phone_number=phone_number, role=role)
-                
-                # Create corresponding object
+
                 if created:
                     if role == "Patient":
-                        Patient.objects.create(patient_id=user)
+                        Patient.objects.create(patient_id=user,name=username)
+
                     elif role == "Doctor":
-                        Doctor.objects.create(doctor_id=user)
+                        # Providing default values for required fields
+                        Doctor.objects.create(
+                            doctor_id=user,
+                            name=username
+                        )
+
                     elif role == "DigitalClinic":
-                        DigitalClinic.objects.create(digital_clinic_id=user)
+                        DigitalClinic.objects.create(
+                            digital_clinic_id=user,
+                            name=username
+                        )
+
                     else:
                         return Response({"error": "Invalid role provided."}, status=status.HTTP_400_BAD_REQUEST)
 
