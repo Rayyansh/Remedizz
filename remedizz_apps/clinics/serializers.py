@@ -9,16 +9,14 @@ class DigitalClinicServiceSerializer(serializers.ModelSerializer):
         fields = ["specialization_offered", "available_service", "operating_hours"]
 
 
-# =========================================================================================================
-
 class ClinicRequestSerializer(serializers.ModelSerializer):
     services = DigitalClinicServiceSerializer(many=True)
-
+    
     class Meta:
         model = DigitalClinic
         fields = [
             "name", "clinic_type", "address", "website_url", "digital_clinic_email",
-            "services",
+            "services", "terms_and_conditions_accepted", "clinic_profile_picture"
         ]
 
     def update(self, instance, validated_data):
@@ -35,6 +33,7 @@ class ClinicRequestSerializer(serializers.ModelSerializer):
                 instance.services.add(service_instance)
 
         return instance
+
     
 class ClinicResponseSerializer(serializers.ModelSerializer):
     digital_clinic_id = serializers.IntegerField(source='id', read_only=True)
@@ -43,8 +42,8 @@ class ClinicResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = DigitalClinic
         fields = [
-            "clinic_id", "name", "clinic_type", "address", "website_url", "digital_clinic_email",
-            "services",
+            "digital_clinic_id", "name", "clinic_type", "address", "website_url", "digital_clinic_email",
+            "services", "terms_and_conditions_accepted", "clinic_profile_picture"
         ]
 
 

@@ -48,7 +48,7 @@ class ClinicController:
     @staticmethod
     @extend_schema(
         description="Update clinic profile",
-        request=ClinicResponseSerializer,
+        request=ClinicRequestSerializer,
         responses=SwaggerPage.response(response=ClinicResponseSerializer)
     )
     @api_view(['PUT']) 
