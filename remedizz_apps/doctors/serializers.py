@@ -20,6 +20,10 @@ class DoctorScheduleSerializer(serializers.ModelSerializer):
         model = DoctorSchedule
         fields = ["appointment_type", "appointment_date", "slot"]
 
+class RegistrationCouncilSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RegistrationCouncil
+        fields = ['id', 'registration_council_name']
 # =========================================================================================================
 
 class DoctorResponseSerializer(serializers.ModelSerializer):
@@ -27,14 +31,19 @@ class DoctorResponseSerializer(serializers.ModelSerializer):
     education = EducationSerializer()
     work_experience = WorkExperienceSerializer()
     schedules = DoctorScheduleSerializer(many=True, read_only=True)
+    registration_council = RegistrationCouncilSerializer()
+    registration_council = serializers.PrimaryKeyRelatedField(
+        queryset=RegistrationCouncil.objects.all()
+    )
+
 
     class Meta:
         model = Doctor
         fields = [
-            "doctor_id", "name", "specialization", "gender", "city", "doctor_contact_number",
+            "doctor_id","name","specialization", "gender", "city", "doctor_contact_number",
             "doctor_email", "doctor_profile_picture", "education", "work_experience",
-            "preferred_language", "terms_and_conditions_accepted", "registration_number",
-            "registration_year", "registration_council", "schedules"
+            "schedules", "preferred_language", "terms_and_conditions_accepted",
+            "registration_number", "registration_year", "registration_council"
         ]
 
 

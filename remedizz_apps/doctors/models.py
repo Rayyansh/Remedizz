@@ -2,6 +2,15 @@ from django.db import models
 from remedizz_apps.user.models import User
 from django.contrib.auth.validators import UnicodeUsernameValidator
 
+
+class RegistrationCouncil(models.Model):
+    registration_council_name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.registration_council_name
+    
+
+
 class Doctor(models.Model):
     doctor_id = models.OneToOneField(User, on_delete=models.CASCADE, related_name="doctor_profile")
     username_validator = UnicodeUsernameValidator()
@@ -38,8 +47,8 @@ class Doctor(models.Model):
 
     # registration information
     registration_number = models.CharField(max_length=50, null=True, blank=True)
-    registration_year = models.DateField(null=True)
-    registration_council = models.CharField(max_length=50, null=True, blank=True)
+    registration_year = models.DateField(null=True) 
+    registration_council = models.ForeignKey(RegistrationCouncil, on_delete=models.CASCADE, null=True)
 
     class Meta:
         db_table = 'doctor'
@@ -52,7 +61,7 @@ class Doctor(models.Model):
 
     @staticmethod
     def get_doctor_by_id(doctor_id):
-        return Doctor.objects.filter(doctor_id=doctor_id).first()
+        return Doctor.objects.filter(id=doctor_id).first()
     
     
     @staticmethod
@@ -65,7 +74,7 @@ class Doctor(models.Model):
     
     @staticmethod
     def delete_doctor(doctor_id):
-        return Doctor.objects.filter(id=doctor_id).first()
+        return Doctor.objects.filter(doctor_id_id=doctor_id).first()
 
 
 class Education(models.Model):

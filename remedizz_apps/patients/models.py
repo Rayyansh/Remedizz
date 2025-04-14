@@ -6,6 +6,7 @@ from django.utils import timezone
 from remedizz_apps.user.models import User
 from django.contrib.auth.validators import UnicodeUsernameValidator
 
+
 class Patient(models.Model):
     patient_id = models.OneToOneField(User, on_delete=models.CASCADE, related_name="patient_profile")
     username_validator = UnicodeUsernameValidator()
