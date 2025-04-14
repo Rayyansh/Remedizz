@@ -6,6 +6,7 @@ from django.utils.timezone import now
 
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.validators import RegexValidator
+from django.core.exceptions import ValidationError
 
 
 
@@ -85,3 +86,11 @@ class User(AbstractBaseUser):
         if self.otp == otp and self.otp_expiry and now() < self.otp_expiry:
             return True
         return False
+    
+    def save(self, *args, **kwargs):
+        # Run phone_number validators only
+        for validator in self._meta.get_field('phone_number').validators:
+            validator(self.phone_number)
+        
+        super().save(*args, **kwargs)
+    

@@ -13,7 +13,7 @@ class IsPatient(BasePermission):
 
 class IsDigitalClinic(BasePermission):
     def has_permission(self, request, view):
-        return request.user and request.role == 'digital_clinic'
+        return request.user and getattr(request.user, "role", None) == "DigitalClinic"
 
 
 class IsAuthenticatedUser(BasePermission):
