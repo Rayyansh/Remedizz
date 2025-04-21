@@ -70,3 +70,56 @@ class DoctorController:
     def search_doctors(request: Request) -> Response:
         return DoctorSearchView().search(request)
 
+# ======================================================================================
+
+
+class RegistrationCouncilController:
+
+    @staticmethod
+    @extend_schema(
+        description="Retrieve all registration council.",
+        responses=SwaggerPage.response(response=RegistrationCouncilResponseSerializer)
+    )
+    @api_view(['GET'])
+    def get_all_registration_council(request):
+        return RegistrationCouncilView.as_view()(request._request)
+
+    @staticmethod
+    @extend_schema(
+        description="Retrieve a single registration council.",
+        responses=SwaggerPage.response(response=RegistrationCouncilResponseSerializer)
+    )
+    @api_view(['GET'])
+    def get_registration_council_by_id(request, registration_council_id):
+        return RegistrationCouncilView.as_view()(request._request, registration_council_id=registration_council_id)
+    
+    @staticmethod
+    @extend_schema(
+        description="Create a new registration council.",
+        request=RegistrationCouncilRequestSerializer,
+        responses=SwaggerPage.response(response=RegistrationCouncilResponseSerializer)
+    )
+    @api_view(['POST'])
+    def create_registration_council(request):
+        return RegistrationCouncilView.as_view()(request._request)
+
+    @staticmethod
+    @extend_schema(
+        description="Update registration council information.",
+        request=RegistrationCouncilRequestSerializer,
+        responses=SwaggerPage.response(response=RegistrationCouncilResponseSerializer)
+    )
+    @api_view(['PUT'])
+    def update_registration_council(request, registration_council_id):
+        return RegistrationCouncilView.as_view()(request._request, registration_council_id=registration_council_id)
+
+    @staticmethod
+    @extend_schema(
+        description="Delete a registration council.",
+        responses=SwaggerPage.response(description="Registration council deleted successfully.")
+    )
+    @api_view(['DELETE'])
+    def delete_registration_council(request, registration_council_id):
+        return RegistrationCouncilView.as_view()(request._request, registration_council_id=registration_council_id)
+
+

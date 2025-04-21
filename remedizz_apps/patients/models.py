@@ -4,6 +4,9 @@ from django.db.models import Q
 from django.utils import timezone
 
 from remedizz_apps.user.models import User
+from remedizz_apps.gender.models import Gender
+from remedizz_apps.city.models import City
+from remedizz_apps.doctors.models import *
 from django.contrib.auth.validators import UnicodeUsernameValidator
 
 
@@ -23,6 +26,8 @@ class Patient(models.Model):
         null=True
     )
     date_of_birth = models.DateField(null=True)
+    gender = models.ForeignKey(Gender, on_delete=models.CASCADE, blank=True, null=True)
+    city = models.ForeignKey(City, on_delete=models.CASCADE, blank=True, null=True)
     address = models.TextField(null=True)
     record = models.FileField(upload_to="patients/records/", null=True, blank=True, max_length=30)
     prescription = models.FileField(upload_to="patients/prescriptions/", null=True, blank=True, max_length=30)
@@ -56,6 +61,8 @@ class ChildPatient(models.Model):
     parent = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='children')
     name = models.CharField(max_length=100)
     date_of_birth = models.DateField()
+    gender = models.ForeignKey(Gender, on_delete=models.CASCADE, blank=True, null=True)
+    city = models.ForeignKey(City, on_delete=models.CASCADE, blank=True, null=True)
     address = models.TextField(null=True, blank=True)
     record = models.FileField(upload_to="patients/child/records/", null=True, blank=True, max_length=30)
     prescription = models.FileField(upload_to="patients/child/prescriptions/", null=True, blank=True, max_length=30)
@@ -65,6 +72,9 @@ class ChildPatient(models.Model):
 
     class Meta:
         db_table = 'child_patient'
+
+    def __str__(self):
+        return f"{self.name} (Child of {self.parent.name})"
 
     def __str__(self):
         return f"{self.name} (Child of {self.parent.name})"
@@ -84,3 +94,7 @@ class ChildPatient(models.Model):
     @staticmethod
     def delete_child(child_id, parent):
         return ChildPatient.objects.filter(id=child_id, parent=parent).delete()
+
+
+# ==========================================================================================================
+

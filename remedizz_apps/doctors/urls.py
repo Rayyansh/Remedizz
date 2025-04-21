@@ -1,5 +1,5 @@
 from django.urls import path
-from remedizz_apps.doctors.controller import DoctorController
+from remedizz_apps.doctors.controller import DoctorController, RegistrationCouncilController
 
 urlpatterns = [
 
@@ -14,5 +14,13 @@ urlpatterns = [
     # Doctor search with doctor name or with speciality
 
     path('search/', DoctorController.search_doctors, name='search_doctors'), 
+
+    # Registration Council urls
+
+    path('registration/council/create/', RegistrationCouncilController.create_registration_council, name='create_registration_council'),  # create
+    path('registration/council/', RegistrationCouncilController.get_all_registration_council, name='registration_council_list_create'),  # get all
+    path('registration/council/<int:registration_council_id>/', RegistrationCouncilController.get_registration_council_by_id, name='registration_council_retrieve'),  # get specific
+    path('registration/council/update/<int:registration_council_id>/', RegistrationCouncilController.update_registration_council, name='update_registration_council'),  # update
+    path('registration/council/delete/<int:registration_council_id>/', RegistrationCouncilController.delete_registration_council, name='delete_registration_council'),  # delete
 ]
 

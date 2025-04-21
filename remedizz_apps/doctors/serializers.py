@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from remedizz_apps.doctors.models import *
 from remedizz_apps.user.models import User
+from remedizz_apps.gender.models import Gender
+from remedizz_apps.city.models import City
+from remedizz_apps.specialization.models import DoctorSpecializations
 
 
 class EducationSerializer(serializers.ModelSerializer):
@@ -20,50 +23,20 @@ class DoctorScheduleSerializer(serializers.ModelSerializer):
         model = DoctorSchedule
         fields = ["appointment_type", "appointment_date", "slot"]
 
-class RegistrationCouncilSerializer(serializers.ModelSerializer):
+# ========================================================================================================
+
+class RegistrationCouncilRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RegistrationCouncil
+        fields = ['registration_council_name']
+
+class RegistrationCouncilResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = RegistrationCouncil
         fields = ['id', 'registration_council_name']
+
+
 # =========================================================================================================
-
-class DoctorResponseSerializer(serializers.ModelSerializer):
-    doctor_id = serializers.IntegerField(source='id', read_only=True)
-    education = EducationSerializer()
-    work_experience = WorkExperienceSerializer()
-    schedules = DoctorScheduleSerializer(many=True, read_only=True)
-    registration_council = RegistrationCouncilSerializer()
-    registration_council = serializers.PrimaryKeyRelatedField(
-        queryset=RegistrationCouncil.objects.all()
-    )
-
-
-    class Meta:
-        model = Doctor
-        fields = [
-            "doctor_id","name","specialization", "gender", "city", "doctor_contact_number",
-            "doctor_email", "doctor_profile_picture", "education", "work_experience",
-            "schedules", "preferred_language", "terms_and_conditions_accepted",
-            "registration_number", "registration_year", "registration_council"
-        ]
-
-
-class DoctorUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Doctor
-        fields = [
-            "specialization", "gender", "city", "doctor_contact_number",
-            "doctor_email", "doctor_profile_picture", "education",
-            "work_experience", "preferred_language",
-            "terms_and_conditions_accepted", "registration_number",
-            "registration_year", "registration_council"
-        ]
-
-
-class DoctorListSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Doctor
-        fields = ["specialization", "city"]
 
 
 class DoctorRequestSerializer(serializers.ModelSerializer):
@@ -73,7 +46,7 @@ class DoctorRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Doctor
-        fields = [
+        fields = [ 
             "specialization", "gender", "city", "doctor_contact_number",
             "doctor_email", "doctor_profile_picture", "education", "work_experience",
             "schedules", "preferred_language", "terms_and_conditions_accepted",
@@ -116,21 +89,27 @@ class DoctorRequestSerializer(serializers.ModelSerializer):
 
         return instance
     
+
+
 class DoctorResponseSerializer(serializers.ModelSerializer):
     doctor_id = serializers.IntegerField(source='id', read_only=True)
     education = EducationSerializer()
     work_experience = WorkExperienceSerializer()
     schedules = DoctorScheduleSerializer(many=True, read_only=True)
 
+    specialization = serializers.SlugRelatedField(read_only=True, slug_field='doctor_spcialization_name')
+    gender = serializers.SlugRelatedField(read_only=True, slug_field='gender_name')
+    city = serializers.SlugRelatedField(read_only=True, slug_field='city_name')
+    registration_council = serializers.SlugRelatedField(read_only=True, slug_field='registration_council_name')
+
     class Meta:
         model = Doctor
         fields = [
-            "doctor_id", "specialization", "gender", "city", "doctor_contact_number",
+            "doctor_id", "name", "specialization", "gender", "city", "doctor_contact_number",
             "doctor_email", "doctor_profile_picture", "education", "work_experience",
-            "preferred_language", "terms_and_conditions_accepted", "registration_number",
-            "registration_year", "registration_council", "schedules"
+            "schedules", "preferred_language", "terms_and_conditions_accepted",
+            "registration_number", "registration_year", "registration_council", 
         ]
-
 
 
 # ============================================================================================================
@@ -141,3 +120,5 @@ class DoctorSearchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Doctor
         fields = ['doctor_name', 'specialization']
+
+# =============================================================================================================
