@@ -1,4 +1,5 @@
 from rest_framework.permissions import BasePermission
+from remedizz_apps.clinics.models import *
 
 
 class IsDoctor(BasePermission):

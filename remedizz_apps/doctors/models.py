@@ -1,15 +1,35 @@
 from django.db import models
 from remedizz_apps.user.models import User
+from remedizz_apps.gender.models import Gender
+from remedizz_apps.city.models import City
+from remedizz_apps.specialization.models import DoctorSpecializations
 from django.contrib.auth.validators import UnicodeUsernameValidator
 
+# Master tables
 
 class RegistrationCouncil(models.Model):
     registration_council_name = models.CharField(max_length=255)
 
     def __str__(self):
         return self.registration_council_name
-    
+      
+    @staticmethod
+    def get_registration_council_by_id(registration_council_id):
+        return RegistrationCouncil.objects.filter(id=registration_council_id).first()
 
+    @staticmethod
+    def get_all_registration_council():
+        return RegistrationCouncil.objects.all()
+
+    @staticmethod
+    def update_registration_council(registration_council_id, **kwargs):
+        return RegistrationCouncil.objects.filter(id=registration_council_id).update(**kwargs)
+
+    @staticmethod
+    def delete_registration_council(registration_council_id):
+        return RegistrationCouncil.objects.filter(id=registration_council_id).delete()
+
+# ==================================================================================================
 
 class Doctor(models.Model):
     doctor_id = models.OneToOneField(User, on_delete=models.CASCADE, related_name="doctor_profile")
@@ -26,13 +46,10 @@ class Doctor(models.Model):
         },
         null=True
     )
-    specialization = models.CharField(max_length=20, choices=[
-        ("Cardiologist", "Cardiologist"),
-        ("Dermatologist", "Dermatologist"),
-        ("Neurologist", "Neurologist"),
-    ])
-    gender = models.CharField(max_length=10, choices=[("Male", "Male"), ("Female", "Female"), ("Other", "Other")])
-    city = models.CharField(max_length=20)
+    
+    specialization = models.ForeignKey(DoctorSpecializations, on_delete=models.CASCADE, blank=True, null=True)
+    gender = models.ForeignKey(Gender, on_delete=models.CASCADE, blank=True, null=True)
+    city = models.ForeignKey(City, on_delete=models.CASCADE, blank=True, null=True)
     doctor_contact_number = models.CharField(max_length=15, null=True, blank=True)
     doctor_email = models.EmailField(max_length=30, null=True, blank=True)
     doctor_profile_picture = models.ImageField(upload_to="doctor_profile_pictures/", null=True, blank=True,
