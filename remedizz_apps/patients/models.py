@@ -59,7 +59,8 @@ class Patient(models.Model):
 
 class ChildPatient(models.Model):
     parent = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='children')
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=30)
+    relation = models.CharField(max_length=30, null=True)
     date_of_birth = models.DateField()
     gender = models.ForeignKey(Gender, on_delete=models.CASCADE, blank=True, null=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE, blank=True, null=True)

@@ -3,15 +3,16 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
-from remedizz_apps.doctors.models import *
-from remedizz_apps.doctors.serializers import *
+from remedizz_apps.doctors.models.doctor import Doctor, RegistrationCouncil
+from remedizz_apps.doctors.serializers.doctor_profile.request import DoctorRequestSerializer, RegistrationCouncilRequestSerializer
+from remedizz_apps.doctors.serializers.doctor_profile.response import DoctorResponseSerializer, RegistrationCouncilResponseSerializer
+from remedizz_apps.appointments.serializers import BookingResponseSerializer
 from remedizz_apps.common.common import Common
 from remedizz_apps.user.permissions import IsDoctor
-
+from remedizz_apps.user.authentication import JWTAuthentication
 
 class DoctorView(APIView):
     permission_classes = [IsAuthenticated, IsDoctor]
-
 
     @Common().exception_handler
     def get(self, request, doctor_id=None):
@@ -26,7 +27,6 @@ class DoctorView(APIView):
         serializer = DoctorResponseSerializer(doctors, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
     @Common().exception_handler
     def put(self, request, doctor_id):
         doctor = Doctor.get_doctor_by_id(doctor_id)
@@ -39,7 +39,6 @@ class DoctorView(APIView):
             return Response(DoctorResponseSerializer(doctor).data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    
     @Common().exception_handler
     def delete(self, request, doctor_id):
         doctor = Doctor.get_doctor_by_id(doctor_id)
@@ -48,8 +47,31 @@ class DoctorView(APIView):
 
         doctor.delete()
         return Response({"message": "Doctor deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+    
+    @Common().exception_handler
+    def get_upcoming_appointments(self, request):
+        doctor_id = JWTAuthentication.authenticate(request) 
+        doctor_id = doctor_id.get("id")
+        upcoming_appointments = Doctor.get_upcoming_appointments(doctor_id)
 
-# ===============================================================================================
+        if not upcoming_appointments:
+            return Response({"message": "No upcoming appointments."}, status=status.HTTP_200_OK)
+
+        serializer = BookingResponseSerializer(upcoming_appointments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @Common().exception_handler
+    def confirm_appointment(self, request, appointment_id: int):
+        doctor_id = JWTAuthentication.authenticate(request) 
+        doctor_id = doctor_id.get("id")
+        success = Doctor.confirm_appointment(doctor_id, appointment_id)
+
+        if success:
+            return Response({"message": "Appointment confirmed successfully."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Appointment not found or already confirmed."}, status=status.HTTP_404_NOT_FOUND)
+
+# ================================== SEARCH CLASS ============================================================
 
 class DoctorSearchView:
     permission_classes = [IsAuthenticated]
@@ -74,9 +96,10 @@ class DoctorSearchView:
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-# ===============================================================================================
+# ================================== SEARCH CLASS ============================================================
 
 
+# ================================== REGISTRAION COUNCIL CLASS ============================================================
 class RegistrationCouncilView(APIView):
 
     @Common().exception_handler
@@ -121,3 +144,29 @@ class RegistrationCouncilView(APIView):
 
         registration_council.delete()
         return Response({"detail": "Registration council deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+
+    @Common().exception_handler
+    def get(self, request, doctor_id):
+
+        # Get upcoming appointments for this doctor
+        upcoming_appointments = Doctor.get_upcoming_appointments(doctor_id)
+
+        if not upcoming_appointments:
+            return Response({"message": "No upcoming appointments."}, status=status.HTTP_200_OK)
+
+        # Serialize the upcoming appointments
+        serializer = BookingResponseSerializer(upcoming_appointments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @Common().exception_handler
+    def put(self, request, appointment_id, doctor_id):
+
+        # Call the model function to confirm the appointment
+        success = Doctor.confirm_appointment(doctor_id, appointment_id)
+
+        if success:
+            return Response({"message": "Appointment confirmed successfully."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Appointment not found or already confirmed."}, status=status.HTTP_404_NOT_FOUND)
+        
+# ================================== REGISTRAION COUNCIL CLASS ============================================================

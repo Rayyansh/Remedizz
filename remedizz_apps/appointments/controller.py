@@ -7,6 +7,7 @@ from remedizz_apps.appointments.views import *
 from remedizz_apps.appointments.serializers import *
 from remedizz_apps.common.swagger import SwaggerPage
 from remedizz_apps.user.permissions import IsPatient, IsDoctor
+from remedizz_apps.doctors.models.doctor import Doctor
 
 
 class BookingController:
@@ -14,11 +15,12 @@ class BookingController:
     @staticmethod
     @extend_schema(
         description="Retrieve all bookings for the authenticated user (patient or doctor).",
-        responses=SwaggerPage.response(response=BookingListSerializer)
+        responses=SwaggerPage.response(response=BookingResponseSerializer)
     )
     @api_view(['GET'])
     @permission_classes([IsAuthenticated])
     def get_all_appointment(request):
+        # Adjusting to return bookings based on the user type (patient or doctor)
         return BookingView().get(request)
 
     @staticmethod
@@ -48,25 +50,16 @@ class BookingController:
         responses=SwaggerPage.response(response=BookingResponseSerializer)
     )
     @api_view(['GET'])
-    @permission_classes([IsAuthenticated , IsPatient])  # No IsPatient check since you're using booking_id directly
+    @permission_classes([IsAuthenticated, IsPatient])
     def get_appointment_status(request, appointment_id: int):
-        # Assuming get method in BookingView handles status as well
-        return BookingView().get_status(request, appointment_id)
-
-
-    # @staticmethod
-    # @extend_schema(
-    #     description="Search for bookings by doctor, patient, or status.",
-    #     responses=SwaggerPage.response(response=BookingListSerializer)
-    # )
-    # @api_view(['GET'])
-    # @permission_classes([IsAuthenticated])
-    # def search_bookings(request):
-    #     return BookingSearchView().get(request)
-
-
-
-
-
-
-
+        return BookingView().get_status(request, appointment_id)    
+    
+    @staticmethod
+    @extend_schema(
+        description="Fetch available slots (15-minute intervals) for a doctor on a specific day.",
+        responses=SwaggerPage.response(response=dict)
+    )
+    @api_view(['GET'])
+    @permission_classes([IsAuthenticated, IsPatient])
+    def get_available_slots(request, doctor_id: int, date: datetime):
+        return AvailableSlotsView().get(request, doctor_id, date)

@@ -2,10 +2,12 @@ from django.db import models
 from remedizz_apps.user.models import User
 from remedizz_apps.gender.models import Gender
 from remedizz_apps.city.models import City
+from remedizz_apps.appointments.models import Appointment
 from remedizz_apps.specialization.models import DoctorSpecializations
 from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.utils import timezone
 
-# Master tables
+# ======================================== REGISTRATION COUNCIL TABLE ================================================
 
 class RegistrationCouncil(models.Model):
     registration_council_name = models.CharField(max_length=255)
@@ -29,7 +31,7 @@ class RegistrationCouncil(models.Model):
     def delete_registration_council(registration_council_id):
         return RegistrationCouncil.objects.filter(id=registration_council_id).delete()
 
-# ==================================================================================================
+# ======================================== REGISTRATION COUNCIL TABLE ================================================
 
 class Doctor(models.Model):
     doctor_id = models.OneToOneField(User, on_delete=models.CASCADE, related_name="doctor_profile")
@@ -78,7 +80,7 @@ class Doctor(models.Model):
 
     @staticmethod
     def get_doctor_by_id(doctor_id):
-        return Doctor.objects.filter(id=doctor_id).first()
+        return Doctor.objects.filter(doctor_id=doctor_id).first()
     
     
     @staticmethod
@@ -87,11 +89,33 @@ class Doctor(models.Model):
     
     @staticmethod
     def update_doctor(doctor_id, **kwargs):
-        return Doctor.objects.filter(id=doctor_id).update(**kwargs)
+        return Doctor.objects.filter(doctor_id=doctor_id).update(**kwargs)
     
     @staticmethod
     def delete_doctor(doctor_id):
-        return Doctor.objects.filter(doctor_id_id=doctor_id).first()
+        return Doctor.objects.filter(doctor_id=doctor_id).first()
+    
+    @staticmethod
+    def get_upcoming_appointments(doctor_id):
+        doctor = Doctor.objects.filter(doctor_id=doctor_id).first()
+        if doctor:
+            return Appointment.objects.filter(
+                doctor=doctor,
+                status="Pending",
+                scheduled_at__gte=timezone.now()  # Assuming there is a field for the scheduled date/time
+            )
+        return None
+
+    @staticmethod
+    def confirm_appointment(doctor_id, appointment_id):
+        doctor = Doctor.objects.filter(doctor_id=doctor_id).first()
+        if doctor:
+            appointment = Appointment.objects.filter(id=appointment_id, doctor=doctor, status="Pending").first()
+            if appointment:
+                appointment.status = 'Confirmed'
+                appointment.save()
+                return True
+        return False
 
 
 class Education(models.Model):
@@ -105,18 +129,3 @@ class WorkExperience(models.Model):
     company_name = models.CharField(max_length=50)
     start_date = models.DateField()
     end_date = models.DateField()
-
-
-class DoctorSchedule(models.Model):
-    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name="schedules")
-    appointment_type = models.CharField(max_length=20, choices=[
-        ("Video Call", "Video Call"),
-        ("Audio Call", "Audio Call"),
-        ("Chat", "Chat"),
-    ], null=True)
-
-    appointment_date = models.DateField(null=True)
-    slot = models.TimeField(null=True)
-
-    def __str__(self):
-        return f"{self.doctor.doctor_id} - {self.appointment_date} - {self.slot}"

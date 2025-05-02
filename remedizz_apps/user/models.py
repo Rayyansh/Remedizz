@@ -80,6 +80,7 @@ class User(AbstractBaseUser):
         self.otp = str(random.randint(100000, 999999))
         self.otp_expiry = now() + timedelta(minutes=5)  # OTP valid for 5 mins
         self.save()
+        return self.otp
 
     def is_otp_valid(self, otp):
         """Validate the OTP"""

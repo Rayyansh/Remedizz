@@ -3,9 +3,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.request import Request
 from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiResponse, OpenApiParameter
 
-from remedizz_apps.doctors.views import *
-from remedizz_apps.doctors.serializers import *
+from remedizz_apps.doctors.views.doctor_profile import DoctorView, DoctorSearchView, RegistrationCouncilView
+from remedizz_apps.doctors.views.doctor_availability import DoctorScheduleView
+from remedizz_apps.doctors.serializers.doctor_profile.request import DoctorRequestSerializer, DoctorSearchSerializer, RegistrationCouncilRequestSerializer
+from remedizz_apps.doctors.serializers.doctor_profile.response import DoctorResponseSerializer, RegistrationCouncilResponseSerializer
+from remedizz_apps.doctors.serializers.doctor_availability.request import DoctorScheduleRequestSerializer
+from remedizz_apps.doctors.serializers.doctor_availability.response import DoctorScheduleResponseSerializer
+
 from remedizz_apps.common.swagger import SwaggerPage
 from remedizz_apps.user.permissions import IsDoctor
 
@@ -56,8 +62,25 @@ class DoctorController:
     def update_doctor(request: Request, doctor_id: int) -> Response:
         return DoctorView().put(request, doctor_id)
     
+    # @staticmethod
+    # @extend_schema(
+    #     description="Get all upcoming appointments for the authenticated doctor.",
+    #     responses=SwaggerPage.response(response=BookingResponseSerializer)
+    # )
+    # @api_view(['GET'])
+    # @permission_classes([IsAuthenticated, IsDoctor])
+    # def get_upcoming_appointments(request):
+    #     return DoctorView().get_upcoming_appointments(request)
 
-# =================================================================================
+    # @staticmethod
+    # @extend_schema(
+    #     description="Confirm a pending appointment for a doctor.",
+    #     responses=SwaggerPage.response(response=BookingResponseSerializer)
+    # )
+    # @api_view(['PUT'])
+    # @permission_classes([IsAuthenticated, IsDoctor])
+    # def confirm_appointment(request, appointment_id: int):
+    #     return DoctorView().confirm_appointment(request, appointment_id)
 
     
     @staticmethod
@@ -70,7 +93,7 @@ class DoctorController:
     def search_doctors(request: Request) -> Response:
         return DoctorSearchView().search(request)
 
-# ======================================================================================
+# ================================== REGISTRACTION COUNCIL ===================================================
 
 
 class RegistrationCouncilController:
@@ -123,3 +146,48 @@ class RegistrationCouncilController:
         return RegistrationCouncilView.as_view()(request._request, registration_council_id=registration_council_id)
 
 
+# ================================== REGISTRACTION COUNCIL ===================================================
+
+class DoctorScheduleController:
+
+    @staticmethod
+    @extend_schema(
+        description="Retrieve doctor schedules. Filter by weekday if provided.",
+        responses=SwaggerPage.response(response=DoctorScheduleResponseSerializer)
+    )
+    @api_view(['GET'])
+    @permission_classes([IsAuthenticated, IsDoctor])
+    def get_doctor_schedule(request: Request, weekday: int = None) -> Response:
+        return DoctorScheduleView().get(request=request, weekday=weekday)
+    
+    @staticmethod
+    @extend_schema(
+        description="Create a new doctor schedule.",
+        request=DoctorScheduleRequestSerializer,
+        responses=SwaggerPage.response(response=DoctorScheduleResponseSerializer)
+    )
+    @api_view(['POST'])
+    @permission_classes([IsAuthenticated, IsDoctor])
+    def create_doctor_schedule(request: Request) -> Response:
+        return DoctorScheduleView().post(request)
+
+    @staticmethod
+    @extend_schema(
+        description="Update an existing doctor schedule.",
+        request=DoctorScheduleRequestSerializer,
+        responses=SwaggerPage.response(response=DoctorScheduleResponseSerializer)
+    )
+    @api_view(['PUT'])
+    @permission_classes([IsAuthenticated, IsDoctor])
+    def update_doctor_schedule(request: Request, schedule_id: int) -> Response:
+        return DoctorScheduleView().put(request, schedule_id)
+
+    @staticmethod
+    @extend_schema(
+        description="Delete a doctor schedule.",
+        responses=SwaggerPage.response(description="Doctor schedule deleted successfully.")
+    )
+    @api_view(['DELETE'])
+    @permission_classes([IsAuthenticated, IsDoctor])
+    def delete_doctor_schedule(request: Request, schedule_id: int) -> Response:
+        return DoctorScheduleView().delete(request, schedule_id)
