@@ -11,7 +11,7 @@ from remedizz_apps.user.utils import send_otp_sms
 from remedizz_apps.user.utils import generate_jwt_token
 from remedizz_apps.user.permissions import IsDoctor, IsPatient, IsDigitalClinic, IsAuthenticatedUser
 from remedizz_apps.patients.models import Patient
-from remedizz_apps.doctors.models import Doctor
+from remedizz_apps.doctors.models.doctor import Doctor
 from remedizz_apps.clinics.models import DigitalClinic
 from django.db import transaction
 
@@ -52,10 +52,7 @@ class UserAuthView(APIView):
                         return Response({"error": "Invalid role provided."}, status=status.HTTP_400_BAD_REQUEST)
 
                 # Generate OTP
-                otp = default_token_generator.make_token(user)[:6]
-                user.otp = otp
-                user.otp_expiry = timezone.now() + timezone.timedelta(minutes=5)
-                user.save()
+                otp = user.generate_otp()
 
                 # Send OTP
                 send_otp_sms(phone_number, otp)

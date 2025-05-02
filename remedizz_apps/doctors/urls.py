@@ -1,5 +1,5 @@
 from django.urls import path
-from remedizz_apps.doctors.controller import DoctorController, RegistrationCouncilController
+from remedizz_apps.doctors.controller import DoctorController, RegistrationCouncilController, DoctorScheduleController
 
 urlpatterns = [
 
@@ -15,6 +15,17 @@ urlpatterns = [
 
     path('search/', DoctorController.search_doctors, name='search_doctors'), 
 
+    # Doctor-specific appointment actions
+    # path('appointments/upcoming/', DoctorController.get_upcoming_appointments, name='doctor-upcoming-appointments'),
+    # path('appointments/confirm/<int:appointment_id>/', DoctorController.confirm_appointment, name='doctor-confirm-appointment'),
+
+    # Doctor Schedule URLS
+    path('schedule/', DoctorScheduleController.get_doctor_schedule, name='get_doctor_schedule'),
+    path('schedule/<int:weekday>/', DoctorScheduleController.get_doctor_schedule, name='get_doctor_schedule_by_weekday'),
+    path('schedule/create/', DoctorScheduleController.create_doctor_schedule, name='create_doctor_schedule'),
+    path('schedule/update/<int:schedule_id>/', DoctorScheduleController.update_doctor_schedule, name='update_doctor_schedule'),
+    path('schedule/delete/<int:schedule_id>/', DoctorScheduleController.delete_doctor_schedule, name='delete_doctor_schedule'),
+    
     # Registration Council urls
 
     path('registration/council/create/', RegistrationCouncilController.create_registration_council, name='create_registration_council'),  # create

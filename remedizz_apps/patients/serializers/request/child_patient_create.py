@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from remedizz_apps.patients.models import Patient
 from remedizz_apps.doctors.models import *
+from remedizz_apps.city.models import City
+from remedizz_apps.gender.models import Gender
 
 
 

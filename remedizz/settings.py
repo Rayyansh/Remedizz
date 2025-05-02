@@ -42,9 +42,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'remedizz_apps.common',
     "remedizz_apps.user",
+    "remedizz_apps.gender",
+    "remedizz_apps.city",
+    "remedizz_apps.specialization",
     "remedizz_apps.patients",
     "remedizz_apps.doctors",
     "remedizz_apps.clinics",
+    "remedizz_apps.appointments",
     "rest_framework",
     "drf_spectacular",
     "rest_framework_simplejwt",
@@ -89,8 +93,12 @@ WSGI_APPLICATION = 'remedizz.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join('BASE_DIR' , 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
     }
 }
 

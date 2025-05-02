@@ -36,7 +36,7 @@ class ClinicRequestSerializer(serializers.ModelSerializer):
 
     
 class ClinicResponseSerializer(serializers.ModelSerializer):
-    digital_clinic_id = serializers.IntegerField(source='id', read_only=True)
+    # digital_clinic_id = serializers.IntegerField(source='id', read_only=True)
     services = DigitalClinicServiceSerializer(many=True, read_only=True)
 
     class Meta:

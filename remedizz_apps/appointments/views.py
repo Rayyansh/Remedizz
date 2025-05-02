@@ -1,66 +1,90 @@
 
+from datetime import datetime
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from remedizz_apps.user.permissions import IsPatient
 from rest_framework.exceptions import PermissionDenied
 
 from remedizz_apps.appointments.models import Appointment
 from remedizz_apps.appointments.serializers import BookingRequestSerializer, BookingResponseSerializer 
 from remedizz_apps.common.common import Common
+from remedizz_apps.doctors.models.doctor_availability import DoctorSchedule
 from remedizz_apps.patients.models import Patient
-
+from remedizz_apps.appointments.utils import generate_available_slots
+from remedizz_apps.appointments.booking_service import BookingService
+from remedizz_apps.user.authentication import JWTAuthentication
 
 class BookingView(APIView):
     permission_classes = [IsAuthenticated]
 
     @Common().exception_handler
     def post(self, request):
-        try:
-            # get patient instance linked to logged-in user
-            patient = Patient.objects.get(patient_id=request.user)
+        user, token = JWTAuthentication().authenticate(request)
+        user = user.id
+        patient_id = Patient.get_patient_by_id(user)
+        patient_id = patient_id.pk
 
-            serializer = BookingRequestSerializer(data=request.data)
-            if serializer.is_valid():
-                # manually set patient
-                appointment = serializer.save(patient=patient)
-                return Response(BookingResponseSerializer(appointment).data, status=status.HTTP_201_CREATED)
+        patient = Patient.objects.get(id=patient_id)
 
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = BookingRequestSerializer(data=request.data, context={'patient': patient})
 
-        except Patient.DoesNotExist:
-            return Response({"error": "Authenticated user is not a patient"}, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
 
+        appointment = BookingService.create_appointment(patient, serializer.validated_data)
+        return Response(BookingResponseSerializer(appointment).data, status=status.HTTP_201_CREATED)
 
     @Common().exception_handler
+    def put(self, request, appointment_id):
+        # Retrieve the appointment to be updated
+        appointment = Appointment.get_appointment_by_id(appointment_id)
+        if not appointment:
+            return Response({"error": "Booking not found"}, status=status.HTTP_404_NOT_FOUND)
+        user, token = JWTAuthentication().authenticate(request)
+        user = user.id
+        patient_id = Patient.get_patient_by_id(user)
+        patient_id = patient_id.pk
+        # Get patient instance linked to logged-in user
+        patient = Patient.objects.get(patient=patient_id)
+
+        # Validate incoming data with serializer
+        serializer = BookingRequestSerializer(appointment, data=request.data, partial=True)
+        if serializer.is_valid():
+            # Use the serializer's update method to handle the update logic
+            updated_appointment = serializer.update(appointment, serializer.validated_data)
+
+            # Return the updated appointment details in response
+            return Response(BookingResponseSerializer(updated_appointment).data, status=status.HTTP_200_OK)
+
+        # If serializer is invalid, return errors
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @Common().exception_handler
     def get(self, request, appointment_id=None):
-     
         if appointment_id:
-          
             appointment = Appointment.get_appointment_by_id(appointment_id)
             if not appointment:
                 return Response({"error": "Booking not found"}, status=status.HTTP_404_NOT_FOUND)
 
-
-
             return Response(BookingResponseSerializer(appointment).data, status=status.HTTP_200_OK)
 
-     
-        appointment =Appointment.get_all_appointment()
+        appointment = Appointment.get_all_appointment()
         serializer = BookingResponseSerializer(appointment, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @Common().exception_handler
     def delete(self, request, appointment_id):
-  
         # Retrieve booking by ID
+        patient_id = JWTAuthentication.authenticate(request) 
+        patient_id = patient_id.get("id")
         appointment = Appointment.get_appointment_by_id(appointment_id)
         if not appointment:
             return Response({"error": "Booking not found"}, status=status.HTTP_404_NOT_FOUND)
 
         # Ensure the patient is accessing their own booking
-        if request.user != appointment.patient.patient_id:
+        if patient_id != appointment.patient.patient_id:
             raise PermissionDenied("You are not authorized to delete this booking.")
 
         # Delete the booking
@@ -69,12 +93,31 @@ class BookingView(APIView):
 
     @Common().exception_handler
     def get_status(self, request, appointment_id: int):
-     
         # Retrieve booking by ID
         appointment = Appointment.get_appointment_by_id(appointment_id)
         if not appointment:
             return Response({"error": "Booking not found"}, status=status.HTTP_404_NOT_FOUND)
-      
 
         # Ensure the patient is accessing their own booking
         return Response({"booking_id": appointment.id, "status": appointment.status}, status=status.HTTP_200_OK)
+
+
+class AvailableSlotsView(APIView):
+    permission_classes = [IsAuthenticated, IsPatient]
+
+    @Common().exception_handler
+    def get(self, request, doctor_id, date):
+        appointment_date = datetime.strptime(date, "%Y-%m-%d").date()
+        schedules = DoctorSchedule.get_schedule_by_day(doctor_id, appointment_date.weekday())
+
+        if not schedules:
+            return Response({"error": "No schedule found for this doctor on the selected day"}, status=404)
+
+        all_available_slots = []
+
+        for schedule in schedules:
+            booked_slots = Appointment.get_booked_slots(doctor_id, schedule.pk, appointment_date)
+            available_slots = generate_available_slots(schedule, appointment_date, booked_slots)
+            all_available_slots.extend(available_slots)
+
+        return Response({"slots": all_available_slots})

@@ -12,7 +12,7 @@ class ChildPatientResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChildPatient
         fields = [
-            'id', 'name', 'gender', 'city', 'date_of_birth', 'address',
+            'id', 'name', 'gender', 'city', 'relation','date_of_birth', 'address',
             'record', 'prescription', 'reports',
             'created_at', 'updated_at',
             'parent_id', 'parent_name'
