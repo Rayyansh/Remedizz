@@ -34,7 +34,7 @@ class DoctorRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Doctor
         fields = [ 
-            "specialization", "gender", "city", "doctor_contact_number",
+            "name","specialization", "gender", "city", "doctor_contact_number",
             "doctor_email", "doctor_profile_picture", "education", "work_experience",
             "preferred_language", "terms_and_conditions_accepted",
             "registration_number", "registration_year", "registration_council"
