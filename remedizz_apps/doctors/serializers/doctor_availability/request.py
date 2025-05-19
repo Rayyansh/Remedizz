@@ -7,7 +7,7 @@ class DoctorScheduleRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DoctorSchedule
-        fields = ['appointment_type', 'weekday', 'start_time', 'end_time', 'slot_duration', 'buffer_time']
+        fields = ['doctor','appointment_type', 'weekday', 'start_time', 'end_time', 'slot_duration', 'buffer_time']
 
     def validate(self, data):
         user = data.get('doctor')
