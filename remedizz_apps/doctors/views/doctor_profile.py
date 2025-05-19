@@ -144,29 +144,5 @@ class RegistrationCouncilView(APIView):
 
         registration_council.delete()
         return Response({"detail": "Registration council deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
-
-    @Common().exception_handler
-    def get(self, request, doctor_id):
-
-        # Get upcoming appointments for this doctor
-        upcoming_appointments = Doctor.get_upcoming_appointments(doctor_id)
-
-        if not upcoming_appointments:
-            return Response({"message": "No upcoming appointments."}, status=status.HTTP_200_OK)
-
-        # Serialize the upcoming appointments
-        serializer = BookingResponseSerializer(upcoming_appointments, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    @Common().exception_handler
-    def put(self, request, appointment_id, doctor_id):
-
-        # Call the model function to confirm the appointment
-        success = Doctor.confirm_appointment(doctor_id, appointment_id)
-
-        if success:
-            return Response({"message": "Appointment confirmed successfully."}, status=status.HTTP_200_OK)
-        else:
-            return Response({"error": "Appointment not found or already confirmed."}, status=status.HTTP_404_NOT_FOUND)
         
 # ================================== REGISTRAION COUNCIL CLASS ============================================================

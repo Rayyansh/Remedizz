@@ -61,26 +61,6 @@ class DoctorController:
     @permission_classes([IsAuthenticated, IsDoctor])
     def update_doctor(request: Request, doctor_id: int) -> Response:
         return DoctorView().put(request, doctor_id)
-    
-    # @staticmethod
-    # @extend_schema(
-    #     description="Get all upcoming appointments for the authenticated doctor.",
-    #     responses=SwaggerPage.response(response=BookingResponseSerializer)
-    # )
-    # @api_view(['GET'])
-    # @permission_classes([IsAuthenticated, IsDoctor])
-    # def get_upcoming_appointments(request):
-    #     return DoctorView().get_upcoming_appointments(request)
-
-    # @staticmethod
-    # @extend_schema(
-    #     description="Confirm a pending appointment for a doctor.",
-    #     responses=SwaggerPage.response(response=BookingResponseSerializer)
-    # )
-    # @api_view(['PUT'])
-    # @permission_classes([IsAuthenticated, IsDoctor])
-    # def confirm_appointment(request, appointment_id: int):
-    #     return DoctorView().confirm_appointment(request, appointment_id)
 
     
     @staticmethod
@@ -100,22 +80,13 @@ class RegistrationCouncilController:
 
     @staticmethod
     @extend_schema(
-        description="Retrieve all registration council.",
+        description="Retrieve all registration councils or by ID.",
         responses=SwaggerPage.response(response=RegistrationCouncilResponseSerializer)
     )
     @api_view(['GET'])
-    def get_all_registration_council(request):
-        return RegistrationCouncilView.as_view()(request._request)
+    def get_registration_council(request, registration_council_id=None):
+        return RegistrationCouncilView().get(request, registration_council_id)
 
-    @staticmethod
-    @extend_schema(
-        description="Retrieve a single registration council.",
-        responses=SwaggerPage.response(response=RegistrationCouncilResponseSerializer)
-    )
-    @api_view(['GET'])
-    def get_registration_council_by_id(request, registration_council_id):
-        return RegistrationCouncilView.as_view()(request._request, registration_council_id=registration_council_id)
-    
     @staticmethod
     @extend_schema(
         description="Create a new registration council.",
@@ -124,17 +95,17 @@ class RegistrationCouncilController:
     )
     @api_view(['POST'])
     def create_registration_council(request):
-        return RegistrationCouncilView.as_view()(request._request)
+        return RegistrationCouncilView().post(request)
 
     @staticmethod
     @extend_schema(
-        description="Update registration council information.",
+        description="Update a registration council.",
         request=RegistrationCouncilRequestSerializer,
         responses=SwaggerPage.response(response=RegistrationCouncilResponseSerializer)
     )
     @api_view(['PUT'])
     def update_registration_council(request, registration_council_id):
-        return RegistrationCouncilView.as_view()(request._request, registration_council_id=registration_council_id)
+        return RegistrationCouncilView().put(request, registration_council_id)
 
     @staticmethod
     @extend_schema(
@@ -143,8 +114,7 @@ class RegistrationCouncilController:
     )
     @api_view(['DELETE'])
     def delete_registration_council(request, registration_council_id):
-        return RegistrationCouncilView.as_view()(request._request, registration_council_id=registration_council_id)
-
+        return RegistrationCouncilView().delete(request, registration_council_id)
 
 # ================================== REGISTRACTION COUNCIL ===================================================
 
