@@ -9,7 +9,10 @@ import datetime
 
 
 class BookingRequestSerializer(serializers.ModelSerializer):
-    doctor = serializers.PrimaryKeyRelatedField(queryset=Doctor.objects.all())
+    doctor = serializers.SlugRelatedField(
+        slug_field='doctor_id',  # ← your custom field
+        queryset=Doctor.objects.all()
+    )
     appointment_date = serializers.DateField()
     appointment_time = serializers.TimeField()
 
@@ -18,12 +21,14 @@ class BookingRequestSerializer(serializers.ModelSerializer):
         fields = ['id','doctor', 'appointment_date', 'appointment_time', 'symptoms', 'status']
 
     def validate(self, data):
-        doctor = data.get('doctor')
+        user = data.get('doctor')
+        print(user.id, user.pk)
+        
         appointment_date = data.get('appointment_date')
         appointment_time = data.get('appointment_time')
-
-        # Get all schedules for the doctor on the same weekday
-        schedules = DoctorSchedule.objects.filter(doctor=doctor, weekday=appointment_date.weekday())
+        if user:
+            # Get all schedules for the doctor on the same weekday
+            schedules = DoctorSchedule.objects.filter(doctor=user.id, weekday=appointment_date.weekday())
 
         if not schedules.exists():
             raise serializers.ValidationError("No schedules found for the doctor on this day.")
@@ -40,7 +45,7 @@ class BookingRequestSerializer(serializers.ModelSerializer):
 
         # Check for duplicate booking
         if Appointment.objects.filter(
-            doctor=doctor,
+            doctor=user.id,
             schedule=matched_schedule,
             appointment_date=appointment_date,
             appointment_time=appointment_time
@@ -87,9 +92,9 @@ class BookingRequestSerializer(serializers.ModelSerializer):
     
 
 class BookingResponseSerializer(serializers.ModelSerializer):
-    doctor_id = serializers.IntegerField(source='doctor.id')
-    patient_id = serializers.IntegerField(source='patient.id')
-    schedule_id = serializers.IntegerField(source='doctor.id')
+    doctor_id = serializers.IntegerField(source='doctor.doctor_id.id')
+    patient_id = serializers.IntegerField(source='patient.patient_id.id')
+    schedule_id = serializers.IntegerField(source='schedule.id')
     appointment_date = serializers.DateField(format="%Y-%m-%d")
     appointment_time = serializers.TimeField()
 

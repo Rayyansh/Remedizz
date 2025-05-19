@@ -21,7 +21,7 @@ from remedizz_apps.user.authentication import JWTAuthentication
 class BookingView(APIView):
     permission_classes = [IsAuthenticated]
 
-    @Common().exception_handler
+    # @Common().exception_handler
     def post(self, request):
         user, token = JWTAuthentication().authenticate(request)
         user = user.id
@@ -32,8 +32,10 @@ class BookingView(APIView):
 
         serializer = BookingRequestSerializer(data=request.data, context={'patient': patient})
 
+        print(request.data)
+        print(Doctor.objects.filter(doctor_id=request.data.get('doctor')).exists())
         serializer.is_valid(raise_exception=True)
-
+        print(serializer.validated_data)
         appointment = BookingService.create_appointment(patient, serializer.validated_data)
         return Response(BookingResponseSerializer(appointment).data, status=status.HTTP_201_CREATED)
 
