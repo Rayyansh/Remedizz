@@ -5,7 +5,6 @@ urlpatterns = [
 
     # Doctor profile crud
 
-    # path('create/', DoctorController.create_doctor, name='create_doctor'),
     path('', DoctorController.get_doctor, name='get_all_doctors'),
     path('<int:doctor_id>/', DoctorController.get_doctor, name='get_doctor'),
     path('update/<int:doctor_id>/', DoctorController.update_doctor, name='update_doctor'),
@@ -14,10 +13,6 @@ urlpatterns = [
     # Doctor search with doctor name or with speciality
 
     path('search/', DoctorController.search_doctors, name='search_doctors'), 
-
-    # Doctor-specific appointment actions
-    # path('appointments/upcoming/', DoctorController.get_upcoming_appointments, name='doctor-upcoming-appointments'),
-    # path('appointments/confirm/<int:appointment_id>/', DoctorController.confirm_appointment, name='doctor-confirm-appointment'),
 
     # Doctor Schedule URLS
     path('schedule/', DoctorScheduleController.get_doctor_schedule, name='get_doctor_schedule'),
