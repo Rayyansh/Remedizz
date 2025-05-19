@@ -16,4 +16,9 @@ urlpatterns = [
 
     # Fetch available slots for a doctor on a specific day
     path('available-slots/<int:doctor_id>/<str:date>/', BookingController.get_available_slots, name='get_available_slots'),
+
+    path('upcoming_appointments/', BookingController.get_upcoming_appointments, name='upcoming-appointments'),
+    path('patient_history/', BookingController.get_patient_history, name='doctor-patient-history'),
+    path('patient_history/<int:patient_id>/', BookingController.get_patient_history_detail_for_doctor, name='doctor-patient-history-detail'
+),
 ]

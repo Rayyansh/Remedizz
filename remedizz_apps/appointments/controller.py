@@ -63,3 +63,34 @@ class BookingController:
     @permission_classes([IsAuthenticated, IsPatient])
     def get_available_slots(request, doctor_id: int, date: datetime):
         return AvailableSlotsView().get(request, doctor_id, date)
+    
+    @staticmethod
+    @extend_schema(
+        description="Get upcoming appointments for the authenticated patient or doctor.",
+        responses=SwaggerPage.response(response=BookingResponseSerializer)
+    )
+    @api_view(['GET'])
+    @permission_classes([IsAuthenticated])
+    def get_upcoming_appointments(request):
+        return BookingView().get_upcoming(request)
+    
+    @staticmethod
+    @extend_schema(
+        description="Get past appointments for a patient (visible to the doctor).",
+        responses=SwaggerPage.response(response=BookingResponseSerializer)
+    )
+    @api_view(['GET'])
+    @permission_classes([IsAuthenticated])
+    def get_patient_history(request):
+        return BookingView().get_patient_history(request)
+    
+
+    @staticmethod
+    @extend_schema(
+        description="Get appointment history with a specific patient (Doctor side).",
+        responses=SwaggerPage.response(response=BookingResponseSerializer)
+    )
+    @api_view(['GET'])
+    @permission_classes([IsAuthenticated, IsDoctor])
+    def get_patient_history_detail_for_doctor(request, patient_id: int):
+        return BookingView().get_patient_history_detail(request, patient_id)
