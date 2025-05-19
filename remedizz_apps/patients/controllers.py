@@ -70,8 +70,8 @@ class ChildPatientController:
     )
     @api_view(['PUT'])
     @permission_classes([IsPatient])
-    def update_child(request, child_id):
-        return ChildPatientView().put(request, child_id)
+    def update_child(request, member_id):
+        return ChildPatientView().put(request, member_id)
 
     @extend_schema(
         description="Delete a child profile",
@@ -79,5 +79,5 @@ class ChildPatientController:
     )
     @api_view(['DELETE'])
     @permission_classes([IsPatient])
-    def delete_child(request, child_id):
-        return ChildPatientView().delete(request, child_id)
+    def delete_child(request, member_id):
+        return ChildPatientView().delete(request, member_id)

@@ -69,10 +69,10 @@ class ChildPatientView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @Common().exception_handler
-    def get(self, request, child_id=None):
+    def get(self, request, member_id=None):
         parent = request.user.patient_profile
-        if child_id:
-            child = ChildPatient.get_by_id(child_id, parent)
+        if member_id:
+            child = ChildPatient.get_by_id(member_id, parent)
             if not child:
                 return Response({"error": "Child patient not found."}, status=status.HTTP_404_NOT_FOUND)
             serializer = ChildPatientResponseSerializer(child)
@@ -83,9 +83,9 @@ class ChildPatientView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @Common().exception_handler
-    def put(self, request, child_id):
+    def put(self, request, member_id):
         parent = request.user.patient_profile
-        child = ChildPatient.get_by_id(child_id, parent)
+        child = ChildPatient.get_by_id(member_id, parent)
         if not child:
             return Response({"error": "Child patient not found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -98,9 +98,9 @@ class ChildPatientView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @Common().exception_handler
-    def delete(self, request, child_id):
+    def delete(self, request, member_id):
         parent = request.user.patient_profile
-        child = ChildPatient.get_by_id(child_id, parent)
+        child = ChildPatient.get_by_id(member_id, parent)
         if not child:
             return Response({"error": "Child patient not found."}, status=status.HTTP_404_NOT_FOUND)
         child.delete()
