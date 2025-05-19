@@ -6,7 +6,7 @@ class DoctorResponseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Doctor
-        fields = ['id', 'name']
+        fields = ['doctor_id', 'name']
 
 class DoctorScheduleResponseSerializer(serializers.ModelSerializer):
     doctor = DoctorResponseSerializer()
