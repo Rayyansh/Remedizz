@@ -1,6 +1,6 @@
 
 from datetime import datetime
-
+from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -11,6 +11,7 @@ from rest_framework.exceptions import PermissionDenied
 from remedizz_apps.appointments.models import Appointment
 from remedizz_apps.appointments.serializers import BookingRequestSerializer, BookingResponseSerializer 
 from remedizz_apps.common.common import Common
+from remedizz_apps.doctors.models.doctor import Doctor
 from remedizz_apps.doctors.models.doctor_availability import DoctorSchedule
 from remedizz_apps.patients.models import Patient
 from remedizz_apps.appointments.utils import generate_available_slots
@@ -101,6 +102,69 @@ class BookingView(APIView):
         # Ensure the patient is accessing their own booking
         return Response({"booking_id": appointment.id, "status": appointment.status}, status=status.HTTP_200_OK)
 
+    @Common().exception_handler
+    def get_upcoming(self, request):
+        user, token = JWTAuthentication().authenticate(request)
+        user_id = user.id
+
+        # Check if user is a patient
+        patient_obj = Patient.get_patient_by_id(user_id)
+        if patient_obj:
+            appointments = Appointment.objects.filter(
+                patient=patient_obj,
+                appointment_date__gte=timezone.now().date()
+            ).order_by('appointment_date', 'appointment_time')
+
+            serializer = BookingResponseSerializer(appointments, many=True)
+            return Response({"upcoming_appointments": serializer.data}, status=200)
+
+        # Check if user is a doctor
+        doctor_obj = Doctor.get_doctor_by_id(user_id)
+        if doctor_obj:
+            appointments = Appointment.objects.filter(
+                doctor=doctor_obj,
+                appointment_date__gte=timezone.now().date()
+            ).order_by('appointment_date', 'appointment_time')
+
+            serializer = BookingResponseSerializer(appointments, many=True)
+            return Response({"upcoming_appointments": serializer.data}, status=200)
+
+        return Response({"error": "Unauthorized role"}, status=403)
+    
+    @Common().exception_handler
+    def get_patient_history(self, request, patient_id: int):
+        user, token = JWTAuthentication().authenticate(request)
+        user = user.id
+        doctor = Doctor.get_doctor_by_id(user)
+
+        if not doctor:
+            return Response({"error": "Doctor not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Get past appointments for this doctor
+        history = Appointment.objects.filter(
+            doctor=doctor,
+            appointment_date__lt=timezone.now().date()
+        ).order_by('-appointment_date', '-appointment_time')
+
+        serializer = BookingResponseSerializer(history, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def get_patient_history_detail(self, request, patient_id: int):
+        user, _ = JWTAuthentication().authenticate(request)
+        doctor = Doctor.get_doctor_by_id(user.id)
+
+        if not doctor:
+            raise PermissionDenied("Only doctors can access patient history.")
+
+        # Get all appointments for this doctor and the specified patient in the past
+        history = Appointment.objects.filter(
+            doctor=doctor,
+            patient__id=patient_id,
+            appointment_date__lt=timezone.now().date()
+        ).order_by('-appointment_date')
+
+        serializer = BookingResponseSerializer(history, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class AvailableSlotsView(APIView):
     permission_classes = [IsAuthenticated, IsPatient]

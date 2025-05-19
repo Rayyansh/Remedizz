@@ -15,7 +15,7 @@ class BookingRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Appointment
-        fields = ['doctor', 'appointment_date', 'appointment_time', 'symptoms', 'status']
+        fields = ['id','doctor', 'appointment_date', 'appointment_time', 'symptoms', 'status']
 
     def validate(self, data):
         doctor = data.get('doctor')
