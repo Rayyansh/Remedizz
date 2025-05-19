@@ -7,11 +7,11 @@ urlpatterns = [
     path('update/<int:patient_id>/', PatientController.update_patient, name='update_patient'),
     path('delete/<int:patient_id>/', PatientController.delete_patient, name='delete_patient'),
 
-    path('child/', ChildPatientController.create_child),
-    path('child/all/', ChildPatientController.get_children),
-    path('child/<int:child_id>/', ChildPatientController.get_children),
-    path('child/update/<int:child_id>/', ChildPatientController.update_child),
-    path('child/delete/<int:child_id>/', ChildPatientController.delete_child),
+    path('members/', ChildPatientController.create_child),
+    path('members/all/', ChildPatientController.get_children),
+    path('members/<int:members_id>/', ChildPatientController.get_children),
+    path('members/update/<int:members_id>/', ChildPatientController.update_child),
+    path('members/delete/<int:members_id>/', ChildPatientController.delete_child),
 ]
 
 
