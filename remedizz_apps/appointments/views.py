@@ -134,36 +134,43 @@ class BookingView(APIView):
         return Response({"error": "Unauthorized role"}, status=403)
     
     @Common().exception_handler
-    def get_patient_history(self, request, patient_id: int):
+    def get_patient_history(self, request):
         user, token = JWTAuthentication().authenticate(request)
-        user = user.id
-        doctor = Doctor.get_doctor_by_id(user)
+        user_id = user.id
 
+        doctor = Doctor.get_doctor_by_id(user_id)
         if not doctor:
             return Response({"error": "Doctor not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Get past appointments for this doctor
+        today = timezone.now().date()
+
+
         history = Appointment.objects.filter(
             doctor=doctor,
-            appointment_date__lt=timezone.now().date()
+            appointment_date__lt=today
         ).order_by('-appointment_date', '-appointment_time')
+
 
         serializer = BookingResponseSerializer(history, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     def get_patient_history_detail(self, request, patient_id: int):
         user, _ = JWTAuthentication().authenticate(request)
-        doctor = Doctor.get_doctor_by_id(user.id)
+        user_id = user.id
+        print("Authenticated User ID:", user_id)
 
+        doctor = Doctor.get_doctor_by_id(user_id)
         if not doctor:
             raise PermissionDenied("Only doctors can access patient history.")
 
-        # Get all appointments for this doctor and the specified patient in the past
+        patient = Patient.get_patient_by_id(patient_id)
+        today = timezone.now().date()
+
         history = Appointment.objects.filter(
             doctor=doctor,
-            patient__id=patient_id,
-            appointment_date__lt=timezone.now().date()
-        ).order_by('-appointment_date')
+            patient__id=patient.id,
+            appointment_date__lt=today
+        ).order_by('-appointment_date', '-appointment_time')
 
         serializer = BookingResponseSerializer(history, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -173,8 +180,9 @@ class AvailableSlotsView(APIView):
 
     @Common().exception_handler
     def get(self, request, doctor_id, date):
+        doctor = Doctor.get_doctor_by_id(doctor_id)
         appointment_date = datetime.strptime(date, "%Y-%m-%d").date()
-        schedules = DoctorSchedule.get_schedule_by_day(doctor_id, appointment_date.weekday())
+        schedules = DoctorSchedule.get_schedule_by_day(doctor, appointment_date.weekday())
 
         if not schedules:
             return Response({"error": "No schedule found for this doctor on the selected day"}, status=404)
@@ -182,7 +190,7 @@ class AvailableSlotsView(APIView):
         all_available_slots = []
 
         for schedule in schedules:
-            booked_slots = Appointment.get_booked_slots(doctor_id, schedule.pk, appointment_date)
+            booked_slots = Appointment.get_booked_slots(doctor, schedule.pk, appointment_date)
             available_slots = generate_available_slots(schedule, appointment_date, booked_slots)
             all_available_slots.extend(available_slots)
 

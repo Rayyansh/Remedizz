@@ -61,7 +61,7 @@ class User(AbstractBaseUser):
         blank=False,
         help_text="Required: 10-digit phone number"
     )
-    profile_picture = models.ImageField(upload_to="users/profile_pictures/", null=True, blank=True, max_length=30)
+    profile_picture = models.ImageField(upload_to="users/profile_pictures/", null=True, blank=True, max_length=50)
     otp = models.CharField(max_length=6, null=True, blank=True)
     otp_expiry = models.DateTimeField(blank=True, null=True)
     max_otp_try = models.CharField(max_length=2, default=3)
