@@ -55,7 +55,7 @@ class Doctor(models.Model):
     doctor_contact_number = models.CharField(max_length=15, null=True, blank=True)
     doctor_email = models.EmailField(max_length=30, null=True, blank=True)
     doctor_profile_picture = models.ImageField(upload_to="doctor_profile_pictures/", null=True, blank=True,
-                                               max_length=30)
+                                               max_length=50)
     education = models.ForeignKey('Education', on_delete=models.CASCADE, related_name="doctor_education", null=True)
     work_experience = models.ForeignKey('WorkExperience', on_delete=models.CASCADE, related_name="doctor_experience",
                                         null=True)

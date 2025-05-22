@@ -34,6 +34,8 @@ class Patient(models.Model):
     reports = models.FileField(upload_to="patients/reports/", null=True, blank=True, max_length=30)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
+    patient_profile_picture = models.ImageField(upload_to="patient_profile_pictures/", null=True, blank=True,
+                                               max_length=50)
 
     class Meta:
         db_table = 'patient'
