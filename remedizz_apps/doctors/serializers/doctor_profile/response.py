@@ -8,8 +8,8 @@ class RegistrationCouncilResponseSerializer(serializers.ModelSerializer):
         fields = ['id', 'registration_council_name']
         
 class DoctorResponseSerializer(serializers.ModelSerializer):
-    education = EducationSerializer()
-    work_experience = WorkExperienceSerializer()
+    education = EducationSerializer(many=True)
+    work_experience = WorkExperienceSerializer(many=True)
 
     specialization = serializers.SlugRelatedField(read_only=True, slug_field='doctor_spcialization_name')
     gender = serializers.SlugRelatedField(read_only=True, slug_field='gender_name')

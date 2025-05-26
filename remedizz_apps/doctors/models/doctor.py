@@ -56,9 +56,9 @@ class Doctor(models.Model):
     doctor_email = models.EmailField(max_length=30, null=True, blank=True)
     doctor_profile_picture = models.ImageField(upload_to="doctor_profile_pictures/", null=True, blank=True,
                                                max_length=50)
-    education = models.ForeignKey('Education', on_delete=models.CASCADE, related_name="doctor_education", null=True)
-    work_experience = models.ForeignKey('WorkExperience', on_delete=models.CASCADE, related_name="doctor_experience",
-                                        null=True)
+    education = models.ManyToManyField('Education', related_name="doctors", blank=True)
+    work_experience = models.ManyToManyField('WorkExperience', related_name="doctors", blank=True)
+
 
     # Preferences
     preferred_language = models.CharField(max_length=15)
