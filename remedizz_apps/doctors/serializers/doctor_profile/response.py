@@ -19,8 +19,13 @@ class DoctorResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Doctor
         fields = [
+            # Doctor Profile
             "doctor_id", "name", "specialization", "gender", "city", "doctor_contact_number",
             "doctor_email", "doctor_profile_picture", "education", "work_experience",
             "preferred_language", "terms_and_conditions_accepted",
-            "registration_number", "registration_year", "registration_council", 
+            "registration_number", "registration_year", "registration_council",
+
+            # Clinic Info
+            "clinic_name", "clinic_contact_number", "clinic_number", "clinic_timings", "opd_fees",
+            "clinic_city", "clinic_locality", "clinic_street_address", "clinic_address", "clinic_pincode"
         ]

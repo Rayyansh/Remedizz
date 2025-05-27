@@ -3,16 +3,20 @@ from remedizz_apps.doctors.models.doctor import Education, WorkExperience, Docto
 
 
 
+
 class EducationSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
+
     class Meta:
         model = Education
-        fields = ["qualification", "college_name", "college_passing_year"]
-
+        fields = ["id", "qualification", "college_name", "college_passing_year"]
 
 class WorkExperienceSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
+
     class Meta:
         model = WorkExperience
-        fields = ["job_profile", "company_name", "start_date", "end_date"]
+        fields = ["id", "job_profile", "company_name", "start_date", "end_date"]
 
 class DoctorSearchSerializer(serializers.ModelSerializer):
     doctor_name = serializers.CharField(source='doctor_id.username', read_only=True)
@@ -34,10 +38,15 @@ class DoctorRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Doctor
         fields = [
+            # Doctor Profile Fields
             "name", "specialization", "gender", "city", "doctor_contact_number",
             "doctor_email", "doctor_profile_picture", "education", "work_experience",
             "preferred_language", "terms_and_conditions_accepted",
-            "registration_number", "registration_year", "registration_council"
+            "registration_number", "registration_year", "registration_council",
+
+            # Clinic Fields
+            "clinic_name", "clinic_contact_number", "clinic_number", "clinic_timings", "opd_fees",
+            "clinic_city", "clinic_locality", "clinic_street_address", "clinic_address", "clinic_pincode"
         ]
 
     def create(self, validated_data):
@@ -82,7 +91,6 @@ class DoctorRequestSerializer(serializers.ModelSerializer):
 
             incoming_edu_ids.append(edu_instance.id)
 
-        # Delete removed educations
         for edu in instance.education.all():
             if edu.id not in incoming_edu_ids:
                 instance.education.remove(edu)
@@ -105,7 +113,6 @@ class DoctorRequestSerializer(serializers.ModelSerializer):
 
             incoming_work_ids.append(work_instance.id)
 
-        # Delete removed work experiences
         for work in instance.work_experience.all():
             if work.id not in incoming_work_ids:
                 instance.work_experience.remove(work)

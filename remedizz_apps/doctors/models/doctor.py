@@ -69,6 +69,19 @@ class Doctor(models.Model):
     registration_year = models.DateField(null=True) 
     registration_council = models.ForeignKey(RegistrationCouncil, on_delete=models.CASCADE, null=True)
 
+    # Clinic Fields
+    clinic_name = models.CharField(max_length=100, null=True, blank=True)
+    clinic_contact_number = models.CharField(max_length=15, null=True, blank=True)
+    clinic_number = models.CharField(max_length=20, null=True, blank=True)
+    clinic_timings = models.CharField(max_length=100, null=True, blank=True)
+    opd_fees = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+
+    clinic_city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, related_name="clinic_city")
+    clinic_locality = models.CharField(max_length=100, null=True, blank=True)
+    clinic_street_address = models.CharField(max_length=255, null=True, blank=True)
+    clinic_address = models.CharField(max_length=255, null=True, blank=True)
+    clinic_pincode = models.CharField(max_length=10, null=True, blank=True)
+
     class Meta:
         db_table = 'doctor'
 
