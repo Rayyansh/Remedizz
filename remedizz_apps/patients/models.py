@@ -67,9 +67,6 @@ class ChildPatient(models.Model):
     gender = models.ForeignKey(Gender, on_delete=models.CASCADE, blank=True, null=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE, blank=True, null=True)
     address = models.TextField(null=True, blank=True)
-    record = models.FileField(upload_to="patients/child/records/", null=True, blank=True, max_length=30)
-    prescription = models.FileField(upload_to="patients/child/prescriptions/", null=True, blank=True, max_length=30)
-    reports = models.FileField(upload_to="patients/child/reports/", null=True, blank=True, max_length=30)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -101,3 +98,30 @@ class ChildPatient(models.Model):
 
 # ==========================================================================================================
 
+class Records(models.Model):
+    RECORD_TYPE = [
+        ('Report','Report'),
+        ('Prescription','Prescription'),
+        ('Invoice','Invoice')
+    ]
+    
+
+
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    record_type = models.CharField(max_length=30, choices=RECORD_TYPE)
+    record_created_at = models.DateTimeField(default=timezone.now)
+    upload_record = models.ImageField(upload_to='patient_record/', max_length=50, null=True, blank=True)
+
+    class Meta:
+        db_table = 'patient_records'
+
+    def __str__(self):
+        return f"{self.record_type} - {self.patient.name}"
+    
+
+    def get_by_patient(patient):
+        return Records.objects.filter(patient=patient)
+    
+    @staticmethod
+    def get_record_by_id_and_patient(record_id, patient):
+        return Records.objects.filter(id=record_id, patient=patient).first()

@@ -7,10 +7,12 @@ from rest_framework.permissions import IsAuthenticated
 from remedizz_apps.user.permissions import IsPatient
 
 from remedizz_apps.patients.views import PatientView, ChildPatientView
+from remedizz_apps.patients.serializers.request.patient_records_create import PatientRecordRequestSerializer
 from remedizz_apps.patients.serializers.request.patient_create import PatientRequestSerializer
 from remedizz_apps.patients.serializers.response.patient_get_all import PatientResponseSerializer
 from remedizz_apps.patients.serializers.request.child_patient_create import ChildPatientRequestSerializer
 from remedizz_apps.patients.serializers.response.child_patient_get_all import ChildPatientResponseSerializer
+from remedizz_apps.patients.serializers.response.get_patient_records import PatientRecordResponseSerializer
 from remedizz_apps.common.swagger import SwaggerPage
 
 
@@ -41,6 +43,46 @@ class PatientController:
     @api_view(['DELETE'])
     def delete_patient(request: Request, patient_id) -> Response:
         return PatientView().delete(request, patient_id=patient_id)
+
+
+
+    @extend_schema(
+        description="Create a new patient record",
+        request=PatientRecordRequestSerializer,
+        responses=SwaggerPage.response(description="Patient Record created successfully.")
+    )
+    @api_view(['POST'])
+    @permission_classes([IsPatient])
+    def create_patient_record(request: Request) -> Response:
+        return PatientView().create_patient_records(request)
+
+    @extend_schema(
+        description="Get all patient records",
+        responses=SwaggerPage.response(response=PatientRecordResponseSerializer(many=True))
+    )
+    @api_view(['GET'])
+    @permission_classes([IsPatient])
+    def get_patient_records(request: Request) -> Response:
+        return PatientView().get_patient_records(request)
+
+    @extend_schema(
+        description="Update a patient record",
+        request=PatientRecordRequestSerializer,
+        responses=SwaggerPage.response(response=PatientRecordResponseSerializer)
+    )
+    @api_view(['PUT'])
+    @permission_classes([IsPatient])
+    def update_patient_records(request: Request, record_id) -> Response:
+        return PatientView().update_patient_records(request, record_id=record_id)
+
+    @extend_schema(
+        description="Delete a patient record",
+        responses=SwaggerPage.response(description="Record deleted successfully.")
+    )
+    @api_view(['DELETE'])
+    @permission_classes([IsPatient])
+    def delete_patient_records(request: Request, record_id) -> Response:
+        return PatientView().delete_patient_records(request, record_id=record_id)
 
 class ChildPatientController:
 

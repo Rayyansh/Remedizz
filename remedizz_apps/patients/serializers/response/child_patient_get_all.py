@@ -13,7 +13,6 @@ class ChildPatientResponseSerializer(serializers.ModelSerializer):
         model = ChildPatient
         fields = [
             'id', 'name', 'gender', 'city', 'relation','date_of_birth', 'address',
-            'record', 'prescription', 'reports',
             'created_at', 'updated_at',
             'parent_id', 'parent_name'
         ]
