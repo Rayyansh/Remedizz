@@ -58,3 +58,91 @@ class ClinicController:
     
 
 
+class ClinicMedicalRecordsController:
+
+    @staticmethod
+    @extend_schema(
+        description="Retrieve medical records of a digital clinic.",
+        responses=SwaggerPage.response(response=ClinicMedicalRecordResponseSerializer)
+    )
+    @api_view(['GET'])
+    @permission_classes([IsAuthenticated, IsDigitalClinic])
+    def get_medical_record(request: Request, digital_clinic_id: int) -> Response:
+        return ClinicMedicalRecordsView().get(request, digital_clinic_id)
+
+    @staticmethod
+    @extend_schema(
+        description="Create medical records for a digital clinic.",
+        request=ClinicMedicalRecordRequestSerializer,
+        responses=SwaggerPage.response(response=ClinicMedicalRecordResponseSerializer)
+    )
+    @api_view(['POST'])
+    @permission_classes([IsAuthenticated, IsDigitalClinic])
+    def create_medical_record(request: Request, digital_clinic_id: int) -> Response:
+        return ClinicMedicalRecordsView().post(request, digital_clinic_id)
+
+    @staticmethod
+    @extend_schema(
+        description="Update medical records of a digital clinic.",
+        request=ClinicMedicalRecordRequestSerializer,
+        responses=SwaggerPage.response(response=ClinicMedicalRecordResponseSerializer)
+    )
+    @api_view(['PUT'])
+    @permission_classes([IsAuthenticated, IsDigitalClinic])
+    def update_medical_record(request: Request, digital_clinic_id: int) -> Response:
+        return ClinicMedicalRecordsView().put(request, digital_clinic_id)
+
+    @staticmethod
+    @extend_schema(
+        description="Delete medical records of a digital clinic.",
+        responses=SwaggerPage.response(description="Medical records deleted successfully.")
+    )
+    @api_view(['DELETE'])
+    @permission_classes([IsAuthenticated, IsDigitalClinic])
+    def delete_medical_record(request: Request, digital_clinic_id: int) -> Response:
+        return ClinicMedicalRecordsView().delete(request, digital_clinic_id)
+
+
+class ClinicPaymentInfoController:
+
+    @staticmethod
+    @extend_schema(
+        description="Retrieve payment info of a digital clinic.",
+        responses=SwaggerPage.response(response=ClinicPaymentInfoResponseSerializer)
+    )
+    @api_view(['GET'])
+    @permission_classes([IsAuthenticated, IsDigitalClinic])
+    def get_payment_info(request: Request, digital_clinic_id: int) -> Response:
+        return ClinicPaymentInfoView().get(request, digital_clinic_id)
+
+    @staticmethod
+    @extend_schema(
+        description="Create payment info for a digital clinic.",
+        request=ClinicPaymentInfoRequestSerializer,
+        responses=SwaggerPage.response(response=ClinicPaymentInfoResponseSerializer)
+    )
+    @api_view(['POST'])
+    @permission_classes([IsAuthenticated, IsDigitalClinic])
+    def create_payment_info(request: Request, digital_clinic_id: int) -> Response:
+        return ClinicPaymentInfoView().post(request, digital_clinic_id)
+
+    @staticmethod
+    @extend_schema(
+        description="Update payment info of a digital clinic.",
+        request=ClinicPaymentInfoRequestSerializer,
+        responses=SwaggerPage.response(response=ClinicPaymentInfoResponseSerializer)
+    )
+    @api_view(['PUT'])
+    @permission_classes([IsAuthenticated, IsDigitalClinic])
+    def update_payment_info(request: Request, digital_clinic_id: int) -> Response:
+        return ClinicPaymentInfoView().put(request, digital_clinic_id)
+
+    @staticmethod
+    @extend_schema(
+        description="Delete payment info of a digital clinic.",
+        responses=SwaggerPage.response(description="Payment info deleted successfully.")
+    )
+    @api_view(['DELETE'])
+    @permission_classes([IsAuthenticated, IsDigitalClinic])
+    def delete_payment_info(request: Request, digital_clinic_id: int) -> Response:
+        return ClinicPaymentInfoView().delete(request, digital_clinic_id)

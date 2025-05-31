@@ -10,9 +10,6 @@ class PatientRequestSerializer(serializers.Serializer):
     address = serializers.CharField()
     gender = serializers.PrimaryKeyRelatedField(queryset=Gender.objects.all())
     city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all())
-    record = serializers.FileField(required=False, allow_null=True)
-    prescription = serializers.FileField(required=False, allow_null=True)
-    reports = serializers.FileField(required=False, allow_null=True)
 
     def create(self, validated_data):
         return Patient.objects.create(**validated_data)

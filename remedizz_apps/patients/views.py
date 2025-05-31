@@ -3,14 +3,16 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
-from remedizz_apps.patients.models import Patient, ChildPatient
+from remedizz_apps.patients.models import Patient, ChildPatient, Records
 from remedizz_apps.patients.serializers.request.patient_create import PatientRequestSerializer
+from remedizz_apps.patients.serializers.request.patient_records_create import PatientRecordRequestSerializer
 from remedizz_apps.patients.serializers.response.patient_get_all import PatientResponseSerializer
 from remedizz_apps.patients.serializers.request.child_patient_create import ChildPatientRequestSerializer
 from remedizz_apps.patients.serializers.response.child_patient_get_all import ChildPatientResponseSerializer
+from remedizz_apps.patients.serializers.response.get_patient_records import PatientRecordResponseSerializer
 from remedizz_apps.common.common import Common
 from remedizz_apps.user.permissions import IsPatient
-
+from remedizz_apps.user.authentication import JWTAuthentication
 
 class PatientView(APIView):
     permission_classes = [IsAuthenticated, IsPatient]
@@ -54,6 +56,58 @@ class PatientView(APIView):
 
         patient.delete()
         return Response({"message": "Patient deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
+    @Common().exception_handler
+    def create_patient_records(self, request):
+        user, _ = JWTAuthentication().authenticate(request)
+        patient = Patient.get_patient_by_id(user.id)
+        request.data['patient'] = patient.pk
+
+        serializer = PatientRecordRequestSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Patient Record created successfully."}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @Common().exception_handler
+    def get_patient_records(self, request):
+        user, _ = JWTAuthentication().authenticate(request)
+        patient = Patient.get_patient_by_id(user.id)
+
+        records = Records.objects.filter(patient=patient)
+        serializer = PatientRecordResponseSerializer(records, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def update_patient_records(self, request, record_id):
+        user, _ = JWTAuthentication().authenticate(request)
+        patient = Patient.get_patient_by_id(user.id)
+        if not patient:
+            return Response({"error": "Patient not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        record = Records.get_record_by_id_and_patient(record_id, patient)
+        if not record:
+            return Response({"error": "Record not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = PatientRecordRequestSerializer(record, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(PatientRecordResponseSerializer(record).data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+    @Common().exception_handler
+    def delete_patient_records(self, request, record_id):
+        user, _ = JWTAuthentication().authenticate(request)
+        patient = Patient.get_patient_by_id(user.id)
+        if not patient:
+            return Response({"error": "Patient not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        record = Records.get_record_by_id_and_patient(record_id, patient)
+        if not record:
+            return Response({"error": "Record not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        record.delete()
+        return Response({"message": "Record deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
 
 
 class ChildPatientView(APIView):

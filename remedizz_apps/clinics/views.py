@@ -49,3 +49,78 @@ class ClinicView(APIView):
         clinic.delete()
         return Response({"message": "Clinic deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
+
+class ClinicMedicalRecordsView(APIView):
+    permission_classes = [IsAuthenticated, IsDigitalClinic]
+
+    @Common().exception_handler
+    def get(self, request, digital_clinic_id=None):
+        record = DigitalClinicMedicalRecords.get_medical_records_by_clinic(digital_clinic_id)
+        if not record:
+            return Response({"error": "Medical record not found"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = ClinicMedicalRecordResponseSerializer(record)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @Common().exception_handler
+    def post(self, request, digital_clinic_id=None):
+        serializer = ClinicMedicalRecordRequestSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(digital_clinic_name_id=digital_clinic_id)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @Common().exception_handler
+    def put(self, request, digital_clinic_id):
+        record = DigitalClinicMedicalRecords.get_medical_records_by_clinic(digital_clinic_id)
+        if not record:
+            return Response({"error": "Medical record not found"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = ClinicMedicalRecordRequestSerializer(record, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(ClinicMedicalRecordResponseSerializer(record).data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @Common().exception_handler
+    def delete(self, request, digital_clinic_id):
+        deleted, _ = DigitalClinicMedicalRecords.delete_medical_records(digital_clinic_id)
+        if not deleted:
+            return Response({"error": "Medical record not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"message": "Medical record deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
+
+class ClinicPaymentInfoView(APIView):
+    permission_classes = [IsAuthenticated, IsDigitalClinic]
+
+    @Common().exception_handler
+    def get(self, request, digital_clinic_id=None):
+        payment = DigitalClinicPaymentInformation.get_payment_info_by_clinic(digital_clinic_id)
+        if not payment:
+            return Response({"error": "Payment info not found"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = ClinicPaymentInfoResponseSerializer(payment)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @Common().exception_handler
+    def post(self, request, digital_clinic_id=None):
+        serializer = ClinicPaymentInfoRequestSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(Digital_clinic_name_id=digital_clinic_id)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @Common().exception_handler
+    def put(self, request, digital_clinic_id):
+        payment = DigitalClinicPaymentInformation.get_payment_info_by_clinic(digital_clinic_id)
+        if not payment:
+            return Response({"error": "Payment info not found"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = ClinicPaymentInfoRequestSerializer(payment, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(ClinicPaymentInfoResponseSerializer(payment).data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @Common().exception_handler
+    def delete(self, request, digital_clinic_id):
+        deleted, _ = DigitalClinicPaymentInformation.delete_payment_info(digital_clinic_id)
+        if not deleted:
+            return Response({"error": "Payment info not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"message": "Payment info deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
