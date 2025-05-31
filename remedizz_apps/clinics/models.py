@@ -8,7 +8,7 @@ class DigitalClinic(models.Model):
     specialization = models.ForeignKey(DoctorSpecializations, on_delete=models.CASCADE, blank=True, null=True)
     services = models.ManyToManyField('DigitalClinicService', blank=True, related_name="clinics")
     username_validator = UnicodeUsernameValidator()
-    name = models.CharField(("username"),
+    clinic_name = models.CharField(("username"),
         max_length=20,
         unique=True,
         help_text=(
