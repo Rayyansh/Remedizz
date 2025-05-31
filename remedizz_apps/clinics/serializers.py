@@ -16,7 +16,7 @@ class ClinicRequestSerializer(serializers.ModelSerializer):
         model = DigitalClinic
         fields = [
             "name", "clinic_type", "address", "website_url", "digital_clinic_email",
-            "services", "terms_and_conditions_accepted"
+            "services", "terms_and_conditions_accepted", "clinic_profile_picture"
         ]
 
     def update(self, instance, validated_data):
@@ -43,7 +43,7 @@ class ClinicResponseSerializer(serializers.ModelSerializer):
         model = DigitalClinic
         fields = [
             "digital_clinic_id", "name", "clinic_type", "address", "website_url", "digital_clinic_email",
-            "services", "terms_and_conditions_accepted"
+            "services", "terms_and_conditions_accepted", "clinic_profile_picture"
         ]
 
 
