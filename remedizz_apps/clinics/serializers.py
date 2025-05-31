@@ -45,13 +45,13 @@ class ClinicRequestSerializer(serializers.ModelSerializer):
 
     
 class ClinicResponseSerializer(serializers.ModelSerializer):
-    digital_clinic_username = serializers.CharField(source='digital_clinic_id.username', read_only=True)
+    owner_name = serializers.CharField(source='digital_clinic_id.username', read_only=True)
     services = DigitalClinicServiceSerializer(many=True, read_only=True)
 
     class Meta:
         model = DigitalClinic
         fields = [
-            "digital_clinic_username", "clinic_name", "clinic_type", "address", "website_url", "digital_clinic_email",
+            "digital_clinic_id", "owner_name", "clinic_name", "clinic_type", "address", "website_url", "digital_clinic_email",
             "services", "terms_and_conditions_accepted", "clinic_profile_picture"
         ]
 
