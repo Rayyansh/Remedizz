@@ -12,28 +12,32 @@ class DigitalClinicServiceSerializer(serializers.ModelSerializer):
 class ClinicRequestSerializer(serializers.ModelSerializer):
     services = DigitalClinicServiceSerializer(many=True)
     owner_name = serializers.CharField(write_only=True, required=False)
+    phone_number = serializers.CharField(write_only=True, required=False)
     
     class Meta:
         model = DigitalClinic
         fields = [
             "clinic_name", "clinic_type", "address", "website_url", "digital_clinic_email",
-            "services", "terms_and_conditions_accepted", "clinic_profile_picture", "owner_name"
+            "services", "terms_and_conditions_accepted", "clinic_profile_picture", "owner_name", "phone_number"
         ]
 
     def update(self, instance, validated_data):
         services_data = validated_data.pop("services", [])
         owner_name = validated_data.pop("owner_name", None)
+        phone_number = validated_data.pop("phone_number", None)
 
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
 
-        # Update username of related User
+        # Update related User fields
+        user = instance.digital_clinic_id
         if owner_name:
-            user = instance.digital_clinic_id
-            user.owner_name = owner_name
-            user.save()
+            user.username = owner_name
+        if phone_number:
+            user.phone_number = phone_number
+        user.save()
 
         if services_data:
             instance.services.clear()
@@ -46,12 +50,14 @@ class ClinicRequestSerializer(serializers.ModelSerializer):
     
 class ClinicResponseSerializer(serializers.ModelSerializer):
     owner_name = serializers.CharField(source='digital_clinic_id.username', read_only=True)
+    phone_number = serializers.CharField(source='digital_clinic_id.phone_number', read_only=True)
+
     services = DigitalClinicServiceSerializer(many=True, read_only=True)
 
     class Meta:
         model = DigitalClinic
         fields = [
-            "digital_clinic_id", "owner_name", "clinic_name", "clinic_type", "address", "website_url", "digital_clinic_email",
+            "digital_clinic_id", "owner_name", "phone_number", "clinic_name", "clinic_type", "address", "website_url", "digital_clinic_email",
             "services", "terms_and_conditions_accepted", "clinic_profile_picture"
         ]
 
