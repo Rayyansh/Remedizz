@@ -7,7 +7,7 @@ from remedizz_apps.clinics.models import *
 from remedizz_apps.clinics.serializers import *
 from remedizz_apps.common.common import Common
 from remedizz_apps.user.permissions import IsDigitalClinic
-
+from remedizz_apps.user.authentication import JWTAuthentication
 
 class ClinicView(APIView):
     permission_classes = [IsAuthenticated, IsDigitalClinic]
@@ -62,10 +62,16 @@ class ClinicMedicalRecordsView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @Common().exception_handler
-    def post(self, request, digital_clinic_id=None):
-        serializer = ClinicMedicalRecordRequestSerializer(data=request.data)
+    def post(self, request):
+        user, _ = JWTAuthentication().authenticate(request)
+        clinic = DigitalClinic.get_clinic_by_id(user.id)
+        
+        data = request.data.copy()
+        data['digital_clinic_id'] = clinic.pk
+
+        serializer = ClinicMedicalRecordRequestSerializer(data=data)
         if serializer.is_valid():
-            serializer.save(digital_clinic_name_id=digital_clinic_id)
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

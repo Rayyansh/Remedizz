@@ -59,13 +59,16 @@ class ClinicResponseSerializer(serializers.ModelSerializer):
 
 
 class ClinicMedicalRecordRequestSerializer(serializers.ModelSerializer):
+    digital_clinic_id = serializers.PrimaryKeyRelatedField(
+        queryset=DigitalClinic.objects.all(), write_only=True
+    )
+
     class Meta:
         model = DigitalClinicMedicalRecords
         fields = [
             "digital_clinic_id",
             "medical_document",
         ]
-
 
 
 class ClinicMedicalRecordResponseSerializer(serializers.ModelSerializer):
