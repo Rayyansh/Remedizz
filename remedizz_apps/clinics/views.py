@@ -64,10 +64,8 @@ class ClinicMedicalRecordsView(APIView):
     @Common().exception_handler
     def post(self, request):
         user, _ = JWTAuthentication().authenticate(request)
-        clinic = DigitalClinic.get_clinic_by_id(user.id)
-        
         data = request.data.copy()
-        data['digital_clinic_id'] = clinic.pk
+        data['digital_clinic_id'] = user.id
 
         serializer = ClinicMedicalRecordRequestSerializer(data=data)
         if serializer.is_valid():
