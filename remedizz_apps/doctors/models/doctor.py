@@ -142,3 +142,30 @@ class WorkExperience(models.Model):
     company_name = models.CharField(max_length=50)
     start_date = models.DateField()
     end_date = models.DateField()
+
+class DoctorMedicalRecords(models.Model):
+    doctor_id = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name="medical_records")
+    medical_document = models.FileField(upload_to="medical_document/", null=True, blank=True)
+
+
+    def __str__(self):
+        return self.medical_document.name
+    
+
+    @staticmethod
+    def get_medical_records_by_doctor(doctor_id):
+        return DoctorMedicalRecords.objects.filter(doctor_id=doctor_id).first()
+    
+    @staticmethod
+    def update_medical_records(doctor_id, **kwargs):
+        return DoctorMedicalRecords.objects.filter(doctor_id=doctor_id).update(**kwargs)
+    
+    @staticmethod
+    def create_medical_records(doctor_id, **kwargs):
+        records = DoctorMedicalRecords.objects.create(doctor_id=doctor_id, **kwargs)
+        return records
+    
+    @staticmethod
+    def delete_medical_records(doctor_id):
+        return DoctorMedicalRecords.objects.filter(doctor_id=doctor_id).delete()
+    

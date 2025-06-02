@@ -11,19 +11,17 @@ class DigitalClinicServiceSerializer(serializers.ModelSerializer):
 
 class ClinicRequestSerializer(serializers.ModelSerializer):
     services = DigitalClinicServiceSerializer(many=True)
-    owner_name = serializers.CharField(write_only=True, required=False)
     phone_number = serializers.CharField(write_only=True, required=False)
     
     class Meta:
         model = DigitalClinic
         fields = [
-            "clinic_name", "clinic_type", "address", "website_url", "digital_clinic_email",
+            "clinic_name", "owner_name", "clinic_type", "address", "website_url", "digital_clinic_email",
             "services", "terms_and_conditions_accepted", "clinic_profile_picture", "owner_name", "phone_number"
         ]
 
     def update(self, instance, validated_data):
         services_data = validated_data.pop("services", [])
-        owner_name = validated_data.pop("owner_name", None)
         phone_number = validated_data.pop("phone_number", None)
 
 
@@ -33,8 +31,7 @@ class ClinicRequestSerializer(serializers.ModelSerializer):
 
         # Update related User fields
         user = instance.digital_clinic_id
-        if owner_name:
-            user.username = owner_name
+
         if phone_number:
             user.phone_number = phone_number
         user.save()
@@ -66,7 +63,7 @@ class ClinicMedicalRecordRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = DigitalClinicMedicalRecords
         fields = [
-            "digital_clinic_name",
+            "digital_clinic_id",
             "medical_document",
         ]
 
@@ -76,7 +73,7 @@ class ClinicMedicalRecordResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = DigitalClinicMedicalRecords
         fields = [
-            "digital_clinic_name",
+            "digital_clinic_id",
             "medical_document",
         ]
 
@@ -85,7 +82,7 @@ class ClinicPaymentInfoRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = DigitalClinicPaymentInformation
         fields = [
-            "digital_clinic_name",
+            "digital_clinic_id",
             "digital_clinic_bank_account_number",
             "ifsc_code",
             "uoi_id",
@@ -95,7 +92,7 @@ class ClinicPaymentInfoResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = DigitalClinicPaymentInformation
         fields = [
-            "digital_clinic_name",
+            "digital_clinic_id",
             "digital_clinic_bank_account_number",
             "ifsc_code",
             "uoi_id",
