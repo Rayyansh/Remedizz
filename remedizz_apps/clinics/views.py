@@ -54,7 +54,8 @@ class ClinicMedicalRecordsView(APIView):
     permission_classes = [IsAuthenticated, IsDigitalClinic]
 
     @Common().exception_handler
-    def get(self, request, digital_clinic_id=None):
+    def get(self, request, clinic_id=None):
+        digital_clinic_id = DigitalClinic.get_clinic_by_id(clinic_id)
         record = DigitalClinicMedicalRecords.get_medical_records_by_clinic(digital_clinic_id)
         if not record:
             return Response({"error": "Medical record not found"}, status=status.HTTP_404_NOT_FOUND)
@@ -64,8 +65,10 @@ class ClinicMedicalRecordsView(APIView):
     @Common().exception_handler
     def post(self, request):
         user, _ = JWTAuthentication().authenticate(request)
+        clinic = DigitalClinic.get_clinic_by_id(user.id)
+        print(clinic.pk)
         data = request.data.copy()
-        data['digital_clinic_id'] = user.id
+        data['digital_clinic_id'] = clinic.pk
 
         serializer = ClinicMedicalRecordRequestSerializer(data=data)
         if serializer.is_valid():
@@ -74,7 +77,8 @@ class ClinicMedicalRecordsView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @Common().exception_handler
-    def put(self, request, digital_clinic_id):
+    def put(self, request, clinic_id):
+        digital_clinic_id = DigitalClinic.get_clinic_by_id(clinic_id)
         record = DigitalClinicMedicalRecords.get_medical_records_by_clinic(digital_clinic_id)
         if not record:
             return Response({"error": "Medical record not found"}, status=status.HTTP_404_NOT_FOUND)
@@ -85,7 +89,9 @@ class ClinicMedicalRecordsView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @Common().exception_handler
-    def delete(self, request, digital_clinic_id):
+    def delete(self, request, clinic_id):
+        digital_clinic_id = DigitalClinic.get_clinic_by_id(clinic_id)
+
         deleted, _ = DigitalClinicMedicalRecords.delete_medical_records(digital_clinic_id)
         if not deleted:
             return Response({"error": "Medical record not found"}, status=status.HTTP_404_NOT_FOUND)
