@@ -3,9 +3,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
-from remedizz_apps.doctors.models.doctor import Doctor, RegistrationCouncil
-from remedizz_apps.doctors.serializers.doctor_profile.request import DoctorRequestSerializer, RegistrationCouncilRequestSerializer
-from remedizz_apps.doctors.serializers.doctor_profile.response import DoctorResponseSerializer, RegistrationCouncilResponseSerializer
+from remedizz_apps.doctors.models.doctor import Doctor, RegistrationCouncil, DoctorMedicalRecords
+from remedizz_apps.doctors.serializers.doctor_profile.request import DoctorRequestSerializer, RegistrationCouncilRequestSerializer, DoctorRecordRequestSerializer
+from remedizz_apps.doctors.serializers.doctor_profile.response import DoctorResponseSerializer, RegistrationCouncilResponseSerializer, DoctorRecordResponseSerializer
 from remedizz_apps.appointments.serializers import BookingResponseSerializer
 from remedizz_apps.common.common import Common
 from remedizz_apps.user.permissions import IsDoctor
@@ -146,3 +146,40 @@ class RegistrationCouncilView(APIView):
         return Response({"detail": "Registration council deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
         
 # ================================== REGISTRAION COUNCIL CLASS ============================================================
+
+class DoctorRecordsView(APIView):
+    permission_classes = [IsAuthenticated, IsDoctor]
+
+    @Common().exception_handler
+    def get(self, request, doctor_id=None):
+        record = DoctorMedicalRecords.get_medical_records_by_doctor(doctor_id)
+        if not record:
+            return Response({"error": "Medical record not found"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = DoctorRecordResponseSerializer(record)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @Common().exception_handler
+    def post(self, request, digital_clinic_id=None):
+        serializer = DoctorRecordRequestSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(digital_clinic_name_id=digital_clinic_id)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @Common().exception_handler
+    def put(self, request, doctor_id):
+        record = DoctorMedicalRecords.get_medical_records_by_doctor(doctor_id)
+        if not record:
+            return Response({"error": "Medical record not found"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = DoctorRecordRequestSerializer(record, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(DoctorRecordResponseSerializer(record).data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @Common().exception_handler
+    def delete(self, request, doctor_id ):
+        deleted, _ = DoctorMedicalRecords.delete_medical_records(doctor_id)
+        if not deleted:
+            return Response({"error": "Medical record not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"message": "Medical record deleted successfully"}, status=status.HTTP_204_NO_CONTENT)

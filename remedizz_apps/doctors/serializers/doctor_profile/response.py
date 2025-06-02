@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from remedizz_apps.doctors.models.doctor import Doctor, RegistrationCouncil
+from remedizz_apps.doctors.models.doctor import Doctor, RegistrationCouncil, DoctorMedicalRecords
 from remedizz_apps.doctors.serializers.doctor_profile.request import EducationSerializer, WorkExperienceSerializer
 
 class RegistrationCouncilResponseSerializer(serializers.ModelSerializer):
@@ -28,4 +28,12 @@ class DoctorResponseSerializer(serializers.ModelSerializer):
             # Clinic Info
             "clinic_name", "clinic_contact_number", "clinic_number", "clinic_timings", "opd_fees",
             "clinic_city", "clinic_locality", "clinic_street_address", "clinic_address", "clinic_pincode"
+        ]
+
+class DoctorRecordResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DoctorMedicalRecords
+        fields = [
+            "doctor_id",
+            "medical_document",
         ]

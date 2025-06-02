@@ -8,6 +8,18 @@ class DigitalClinic(models.Model):
     specialization = models.ForeignKey(DoctorSpecializations, on_delete=models.CASCADE, blank=True, null=True)
     services = models.ManyToManyField('DigitalClinicService', blank=True, related_name="clinics")
     username_validator = UnicodeUsernameValidator()
+    owner_name = models.CharField(("username"),
+        max_length=20,
+        unique=True,
+        help_text=(
+            "Required. 20 characters or fewer. Letters, digits and @/./+/-/_ only."
+        ),
+        validators=[username_validator],
+        error_messages={
+            "unique": ("A user with that username already exists."),
+        },
+        null=True
+    )
     clinic_name = models.CharField(("username"),
         max_length=20,
         unique=True,
@@ -91,50 +103,50 @@ class DigitalClinicService(models.Model):
 
 
 class DigitalClinicMedicalRecords(models.Model):
-    digital_clinic_name = models.ForeignKey(DigitalClinic, on_delete=models.CASCADE, related_name="medical_records")
+    digital_clinic_id = models.ForeignKey(DigitalClinic, on_delete=models.CASCADE, related_name="medical_records")
     medical_document = models.FileField(upload_to="medical_document/", null=True, blank=True)
 
 
     def __str__(self):
-        return self.digital_clinic_name.name
+        return self.medical_document.name
     
 
     @staticmethod
     def get_medical_records_by_clinic(clinic_id):
-        return DigitalClinicMedicalRecords.objects.filter(digital_clinic_name_id=clinic_id).first()
+        return DigitalClinicMedicalRecords.objects.filter(digital_clinic_id=clinic_id).first()
     
     @staticmethod
     def update_medical_records(clinic_id, **kwargs):
-        return DigitalClinicMedicalRecords.objects.filter(digital_clinic_name_id=clinic_id).update(**kwargs)
+        return DigitalClinicMedicalRecords.objects.filter(digital_clinic_id=clinic_id).update(**kwargs)
     
     @staticmethod
     def create_medical_records(clinic_id, **kwargs):
-        records = DigitalClinicMedicalRecords.objects.create(digital_clinic_name_id=clinic_id, **kwargs)
+        records = DigitalClinicMedicalRecords.objects.create(digital_clinic_id=clinic_id, **kwargs)
         return records
     
     @staticmethod
     def delete_medical_records(clinic_id):
-        return DigitalClinicMedicalRecords.objects.filter(digital_clinic_name_id=clinic_id).delete()
+        return DigitalClinicMedicalRecords.objects.filter(digital_clinic_id=clinic_id).delete()
     
     
 
 
 class DigitalClinicPaymentInformation(models.Model):
-    digital_clinic_name = models.ForeignKey(DigitalClinic, on_delete=models.CASCADE, related_name="payment_information")
+    digital_clinic_id = models.ForeignKey(DigitalClinic, on_delete=models.CASCADE, related_name="payment_information")
     digital_clinic_bank_account_number = models.CharField(max_length=20)
     ifsc_code = models.CharField(max_length=10)
     uoi_id = models.CharField(max_length=10)
 
     def __str__(self):
-        return self.digital_clinic_name.name
+        return self.digital_clinic_id.name
     
     @staticmethod
     def get_payment_info_by_clinic(clinic_id):
-        return DigitalClinicPaymentInformation.objects.filter(Digital_clinic_name_id=clinic_id).first()
+        return DigitalClinicPaymentInformation.objects.filter(digital_clinic_id=clinic_id).first()
     
     @staticmethod
     def update_payment_info(clinic_id, **kwargs):
-        return DigitalClinicPaymentInformation.objects.filter(Digital_clinic_name_id=clinic_id).update(**kwargs)
+        return DigitalClinicPaymentInformation.objects.filter(digital_clinic_id=clinic_id).update(**kwargs)
     
     @staticmethod
     def create_payment_info_by_id(payment_id, **kwargs):
@@ -144,7 +156,7 @@ class DigitalClinicPaymentInformation(models.Model):
 
     @staticmethod
     def delete_payment_info(clinic_id):
-        return DigitalClinicPaymentInformation.objects.filter(Digital_clinic_name_id=clinic_id).delete()
+        return DigitalClinicPaymentInformation.objects.filter(digital_clinic_id=clinic_id).delete()
 
     @staticmethod
     def get_payment_info_by_id(payment_id):

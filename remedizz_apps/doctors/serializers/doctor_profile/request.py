@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from remedizz_apps.doctors.models.doctor import Education, WorkExperience, Doctor, RegistrationCouncil
+from remedizz_apps.doctors.models.doctor import Education, WorkExperience, Doctor, RegistrationCouncil, DoctorMedicalRecords
 
 
 
@@ -119,3 +119,13 @@ class DoctorRequestSerializer(serializers.ModelSerializer):
                 work.delete()
 
         return instance
+    
+
+
+class DoctorRecordRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DoctorMedicalRecords
+        fields = [
+            "doctor_id",
+            "medical_document",
+        ]

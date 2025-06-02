@@ -5,10 +5,10 @@ from rest_framework.request import Request
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import OpenApiResponse, OpenApiParameter
 
-from remedizz_apps.doctors.views.doctor_profile import DoctorView, DoctorSearchView, RegistrationCouncilView
+from remedizz_apps.doctors.views.doctor_profile import DoctorView, DoctorSearchView, RegistrationCouncilView, DoctorRecordsView
 from remedizz_apps.doctors.views.doctor_availability import DoctorScheduleView
-from remedizz_apps.doctors.serializers.doctor_profile.request import DoctorRequestSerializer, DoctorSearchSerializer, RegistrationCouncilRequestSerializer
-from remedizz_apps.doctors.serializers.doctor_profile.response import DoctorResponseSerializer, RegistrationCouncilResponseSerializer
+from remedizz_apps.doctors.serializers.doctor_profile.request import DoctorRequestSerializer, DoctorSearchSerializer, RegistrationCouncilRequestSerializer, DoctorRecordRequestSerializer
+from remedizz_apps.doctors.serializers.doctor_profile.response import DoctorResponseSerializer, RegistrationCouncilResponseSerializer, DoctorRecordResponseSerializer
 from remedizz_apps.doctors.serializers.doctor_availability.request import DoctorScheduleRequestSerializer
 from remedizz_apps.doctors.serializers.doctor_availability.response import DoctorScheduleResponseSerializer
 
@@ -161,3 +161,48 @@ class DoctorScheduleController:
     @permission_classes([IsAuthenticated, IsDoctor])
     def delete_doctor_schedule(request: Request, schedule_id: int) -> Response:
         return DoctorScheduleView().delete(request, schedule_id)
+    
+
+class DoctorRecordsController:
+
+    @staticmethod
+    @extend_schema(
+        description="Retrieve medical records of a digital clinic.",
+        responses=SwaggerPage.response(response=DoctorResponseSerializer)
+    )
+    @api_view(['GET'])
+    @permission_classes([IsAuthenticated, IsDoctor])
+    def get_medical_record(request: Request, digital_clinic_id: int) -> Response:
+        return DoctorRecordsView().get(request, digital_clinic_id)
+
+    @staticmethod
+    @extend_schema(
+        description="Create medical records for a digital clinic.",
+        request=DoctorRecordRequestSerializer,
+        responses=SwaggerPage.response(response=DoctorResponseSerializer)
+    )
+    @api_view(['POST'])
+    @permission_classes([IsAuthenticated, IsDoctor])
+    def create_medical_record(request: Request, digital_clinic_id: int) -> Response:
+        return DoctorRecordsView().post(request, digital_clinic_id)
+
+    @staticmethod
+    @extend_schema(
+        description="Update medical records of a digital clinic.",
+        request=DoctorRecordRequestSerializer,
+        responses=SwaggerPage.response(response=DoctorResponseSerializer)
+    )
+    @api_view(['PUT'])
+    @permission_classes([IsAuthenticated, IsDoctor])
+    def update_medical_record(request: Request, digital_clinic_id: int) -> Response:
+        return DoctorRecordsView().put(request, digital_clinic_id)
+
+    @staticmethod
+    @extend_schema(
+        description="Delete medical records of a digital clinic.",
+        responses=SwaggerPage.response(description="Medical records deleted successfully.")
+    )
+    @api_view(['DELETE'])
+    @permission_classes([IsAuthenticated, IsDoctor])
+    def delete_medical_record(request: Request, digital_clinic_id: int) -> Response:
+        return DoctorRecordsView().delete(request, digital_clinic_id)
