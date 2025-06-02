@@ -78,8 +78,8 @@ class ClinicMedicalRecordsController:
     )
     @api_view(['POST'])
     @permission_classes([IsAuthenticated, IsDigitalClinic])
-    def create_medical_record(request: Request, digital_clinic_id: int) -> Response:
-        return ClinicMedicalRecordsView().post(request, digital_clinic_id)
+    def create_medical_record(request: Request) -> Response:
+        return ClinicMedicalRecordsView().post(request)
 
     @staticmethod
     @extend_schema(
