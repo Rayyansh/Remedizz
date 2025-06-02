@@ -46,7 +46,6 @@ class ClinicRequestSerializer(serializers.ModelSerializer):
 
     
 class ClinicResponseSerializer(serializers.ModelSerializer):
-    owner_name = serializers.CharField(source='digital_clinic_id.username', read_only=True)
     phone_number = serializers.CharField(source='digital_clinic_id.phone_number', read_only=True)
 
     services = DigitalClinicServiceSerializer(many=True, read_only=True)

@@ -1,5 +1,5 @@
 from django.urls import path
-from remedizz_apps.doctors.controller import DoctorController, RegistrationCouncilController, DoctorScheduleController
+from remedizz_apps.doctors.controller import DoctorController, RegistrationCouncilController, DoctorScheduleController, DoctorRecordsController
 
 urlpatterns = [
 
@@ -28,5 +28,11 @@ urlpatterns = [
     path('registration/council/<int:registration_council_id>/', RegistrationCouncilController.get_registration_council, name='registration_council_retrieve'),  # get specific
     path('registration/council/update/<int:registration_council_id>/', RegistrationCouncilController.update_registration_council, name='update_registration_council'),  # update
     path('registration/council/delete/<int:registration_council_id>/', RegistrationCouncilController.delete_registration_council, name='delete_registration_council'),  # delete
+
+    # ClinicMedicalRecordsController
+    path('medical-records/', DoctorRecordsController.get_medical_record, name='get_medical_records'),
+    path('medical-records/create/', DoctorRecordsController.create_medical_record, name='create_medical_record'),
+    path('medical-records/update/<int:clinic_id>/', DoctorRecordsController.update_medical_record, name='update_medical_record'),
+    path('medical-records/delete/<int:clinic_id>/', DoctorRecordsController.delete_medical_record, name='delete_medical_record'),
 ]
 
