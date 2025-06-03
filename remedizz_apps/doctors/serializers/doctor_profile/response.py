@@ -31,9 +31,19 @@ class DoctorResponseSerializer(serializers.ModelSerializer):
         ]
 
 class DoctorRecordResponseSerializer(serializers.ModelSerializer):
+    doctor_id = serializers.IntegerField(source="doctor_id.doctor_id.id", read_only=True)
+
     class Meta:
         model = DoctorMedicalRecords
         fields = [
             "doctor_id",
             "medical_document",
         ]
+
+class DoctorMedicalRecordGroupedSerializer(serializers.Serializer):
+    doctor_id = serializers.IntegerField()
+    medical_documents = serializers.ListField(
+        child=serializers.DictField(
+            child=serializers.CharField()
+        )
+    )

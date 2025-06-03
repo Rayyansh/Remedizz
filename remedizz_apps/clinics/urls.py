@@ -16,7 +16,7 @@ urlpatterns = [
     # ClinicMedicalRecordsController
     path('medical-records/<int:clinic_id>/', ClinicMedicalRecordsController.get_medical_record, name='get_medical_records'),
     path('medical-records/create/', ClinicMedicalRecordsController.create_medical_record, name='create_medical_record'),
-    path('medical-records/update/<int:clinic_id>/', ClinicMedicalRecordsController.update_medical_record, name='update_medical_record'),
+    path('medical-records/update/', ClinicMedicalRecordsController.update_medical_record, name='update_medical_record'),
     path('medical-records/delete/<int:clinic_id>/', ClinicMedicalRecordsController.delete_medical_record, name='delete_medical_record'),
 ]
 

@@ -172,8 +172,8 @@ class DoctorRecordsController:
     )
     @api_view(['GET'])
     @permission_classes([IsAuthenticated, IsDoctor])
-    def get_medical_record(request: Request, digital_clinic_id: int) -> Response:
-        return DoctorRecordsView().get(request, digital_clinic_id)
+    def get_medical_record(request: Request, doctor_id: int) -> Response:
+        return DoctorRecordsView().get(request, doctor_id)
 
     @staticmethod
     @extend_schema(
@@ -183,8 +183,8 @@ class DoctorRecordsController:
     )
     @api_view(['POST'])
     @permission_classes([IsAuthenticated, IsDoctor])
-    def create_medical_record(request: Request, digital_clinic_id: int) -> Response:
-        return DoctorRecordsView().post(request, digital_clinic_id)
+    def create_medical_record(request: Request) -> Response:
+        return DoctorRecordsView().post(request)
 
     @staticmethod
     @extend_schema(
@@ -194,8 +194,8 @@ class DoctorRecordsController:
     )
     @api_view(['PUT'])
     @permission_classes([IsAuthenticated, IsDoctor])
-    def update_medical_record(request: Request, digital_clinic_id: int) -> Response:
-        return DoctorRecordsView().put(request, digital_clinic_id)
+    def update_medical_record(request: Request) -> Response:
+        return DoctorRecordsView().put(request)
 
     @staticmethod
     @extend_schema(
@@ -204,5 +204,5 @@ class DoctorRecordsController:
     )
     @api_view(['DELETE'])
     @permission_classes([IsAuthenticated, IsDoctor])
-    def delete_medical_record(request: Request, digital_clinic_id: int) -> Response:
-        return DoctorRecordsView().delete(request, digital_clinic_id)
+    def delete_medical_record(request: Request, doctor_id: int) -> Response:
+        return DoctorRecordsView().delete(request, doctor_id)

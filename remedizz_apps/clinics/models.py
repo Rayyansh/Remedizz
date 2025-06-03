@@ -6,7 +6,8 @@ from remedizz_apps.specialization.models import DoctorSpecializations
 class DigitalClinic(models.Model):
     digital_clinic_id = models.OneToOneField(User, on_delete=models.CASCADE, related_name="clinic_profile")
     specialization = models.ForeignKey(DoctorSpecializations, on_delete=models.CASCADE, blank=True, null=True)
-    services = models.ManyToManyField('DigitalClinicService', blank=True, related_name="clinics")
+    available_service = models.CharField(max_length=20, null=True)
+    operating_hours = models.CharField(max_length=20, null=True)
     username_validator = UnicodeUsernameValidator()
     owner_name = models.CharField(("username"),
         max_length=20,
@@ -71,35 +72,35 @@ class DigitalClinic(models.Model):
     def delete_clinic(clinic_id):
         return DigitalClinic.objects.filter(digital_clinic_id=clinic_id).delete()
     
-class DigitalClinicService(models.Model):
+# class DigitalClinicService(models.Model):
    
-    specialization_offered = models.CharField(max_length=20)
-    available_service = models.TextField()  # Can store multiple services as a comma-separated list
-    operating_hours = models.CharField(max_length=20)  # Example: "9 AM - 6 PM"
+#     specialization_offered = models.CharField(max_length=20)
+#     available_service = models.TextField()  # Can store multiple services as a comma-separated list
+#     operating_hours = models.CharField(max_length=20)  # Example: "9 AM - 6 PM"
 
-    def __str__(self):
-        return f"{self.clinic.name} - {self.specialization_offered}"
+#     def __str__(self):
+#         return f"{self.clinic.name} - {self.specialization_offered}"
     
-    @staticmethod
-    def get_services_by_clinic(clinic_id):
-        return DigitalClinicService.objects.filter(clinic_id=clinic_id)
+#     @staticmethod
+#     def get_services_by_clinic(clinic_id):
+#         return DigitalClinicService.objects.filter(clinic_id=clinic_id)
     
-    @staticmethod
-    def get_service_by_id(service_id):
-        return DigitalClinicService.objects.filter(id=service_id).first()
+#     @staticmethod
+#     def get_service_by_id(service_id):
+#         return DigitalClinicService.objects.filter(id=service_id).first()
     
-    @staticmethod
-    def update_service(service_id, **kwargs):
-        return DigitalClinicService.objects.filter(id=service_id).update(**kwargs)
+#     @staticmethod
+#     def update_service(service_id, **kwargs):
+#         return DigitalClinicService.objects.filter(id=service_id).update(**kwargs)
     
-    @staticmethod
-    def create_service(clinic_id, **kwargs):
-        service = DigitalClinicService.objects.create(clinic_id=clinic_id, **kwargs)
-        return service
+#     @staticmethod
+#     def create_service(clinic_id, **kwargs):
+#         service = DigitalClinicService.objects.create(clinic_id=clinic_id, **kwargs)
+#         return service
     
-    @staticmethod
-    def delete_service(service_id):
-        return DigitalClinicService.objects.filter(id=service_id).delete()
+#     @staticmethod
+#     def delete_service(service_id):
+#         return DigitalClinicService.objects.filter(id=service_id).delete()
 
 
 class DigitalClinicMedicalRecords(models.Model):
@@ -113,7 +114,7 @@ class DigitalClinicMedicalRecords(models.Model):
 
     @staticmethod
     def get_medical_records_by_clinic(clinic_id):
-        return DigitalClinicMedicalRecords.objects.filter(digital_clinic_id=clinic_id).first()
+        return DigitalClinicMedicalRecords.objects.filter(digital_clinic_id=clinic_id)
     
     @staticmethod
     def update_medical_records(clinic_id, **kwargs):
