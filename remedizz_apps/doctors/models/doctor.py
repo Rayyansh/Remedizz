@@ -154,7 +154,7 @@ class DoctorMedicalRecords(models.Model):
 
     @staticmethod
     def get_medical_records_by_doctor(doctor_id):
-        return DoctorMedicalRecords.objects.filter(doctor_id=doctor_id).first()
+        return DoctorMedicalRecords.objects.filter(doctor_id=doctor_id)
     
     @staticmethod
     def update_medical_records(doctor_id, **kwargs):

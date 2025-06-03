@@ -4,8 +4,8 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from remedizz_apps.doctors.models.doctor import Doctor, RegistrationCouncil, DoctorMedicalRecords
-from remedizz_apps.doctors.serializers.doctor_profile.request import DoctorRequestSerializer, RegistrationCouncilRequestSerializer, DoctorRecordRequestSerializer
-from remedizz_apps.doctors.serializers.doctor_profile.response import DoctorResponseSerializer, RegistrationCouncilResponseSerializer, DoctorRecordResponseSerializer
+from remedizz_apps.doctors.serializers.doctor_profile.request import DoctorRequestSerializer, RegistrationCouncilRequestSerializer, DoctorRecordRequestSerializer, DoctorRecordBulkUpdateRequestSerializer
+from remedizz_apps.doctors.serializers.doctor_profile.response import DoctorResponseSerializer, RegistrationCouncilResponseSerializer, DoctorRecordResponseSerializer, DoctorMedicalRecordGroupedSerializer
 from remedizz_apps.appointments.serializers import BookingResponseSerializer
 from remedizz_apps.common.common import Common
 from remedizz_apps.user.permissions import IsDoctor
@@ -150,35 +150,79 @@ class RegistrationCouncilView(APIView):
 class DoctorRecordsView(APIView):
     permission_classes = [IsAuthenticated, IsDoctor]
 
-    @Common().exception_handler
     def get(self, request, doctor_id=None):
-        record = DoctorMedicalRecords.get_medical_records_by_doctor(doctor_id)
-        if not record:
+        doctor_id = Doctor.get_doctor_by_id(doctor_id)
+        records = DoctorMedicalRecords.get_medical_records_by_doctor(doctor_id)
+        if not records:
             return Response({"error": "Medical record not found"}, status=status.HTTP_404_NOT_FOUND)
-        serializer = DoctorRecordResponseSerializer(record)
+
+        medical_documents = [{str(record.id): record.medical_document.url} for record in records]
+
+        grouped_data = {
+            "doctor_id": doctor_id.doctor_id.id,
+            "medical_documents": medical_documents
+        }
+
+        serializer = DoctorMedicalRecordGroupedSerializer(grouped_data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @Common().exception_handler
-    def post(self, request, digital_clinic_id=None):
-        serializer = DoctorRecordRequestSerializer(data=request.data)
+    def post(self, request, doctor_id=None):
+        user, _ = JWTAuthentication().authenticate(request)
+        doctor = Doctor.get_doctor_by_id(user.id)
+        print(doctor.pk)
+        data = request.data.copy()
+        data['doctor_id'] = doctor.pk
+
+        serializer = DoctorRecordRequestSerializer(data=data)
         if serializer.is_valid():
-            serializer.save(digital_clinic_name_id=digital_clinic_id)
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @Common().exception_handler
-    def put(self, request, doctor_id):
-        record = DoctorMedicalRecords.get_medical_records_by_doctor(doctor_id)
-        if not record:
-            return Response({"error": "Medical record not found"}, status=status.HTTP_404_NOT_FOUND)
-        serializer = DoctorRecordRequestSerializer(record, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(DoctorRecordResponseSerializer(record).data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def put(self, request):
+        serializer = DoctorRecordBulkUpdateRequestSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        doctor_id = serializer.validated_data["doctor_id"]
+        updates = serializer.validated_data["updates"]
+
+        doctor = Doctor.get_doctor_by_id(doctor_id)
+        if not doctor:
+            return Response({"error": "Doctor not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        updated_records = []
+
+        for item in updates:
+            record_id = item["record_id"]
+            medical_document = item["medical_document"]
+
+            record = DoctorMedicalRecords.objects.filter(id=record_id, doctor_id=doctor).first()
+            if not record:
+                # Optionally skip or return error here
+                continue
+
+            # Partial update using a simple serializer or model method
+            record.medical_document = medical_document
+            record.save()
+            updated_records.append(record)
+
+        # Serialize updated records for response
+        response_serializer = DoctorRecordResponseSerializer(updated_records, many=True)
+        return Response(
+            {
+                "status": True,
+                "message": f"{len(updated_records)} record(s) updated successfully",
+                "data": response_serializer.data,
+            },
+            status=status.HTTP_200_OK,
+        )
 
     @Common().exception_handler
     def delete(self, request, doctor_id ):
+        doctor_id = Doctor.get_doctor_by_id(doctor_id)
         deleted, _ = DoctorMedicalRecords.delete_medical_records(doctor_id)
         if not deleted:
             return Response({"error": "Medical record not found"}, status=status.HTTP_404_NOT_FOUND)

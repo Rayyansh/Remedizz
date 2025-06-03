@@ -30,9 +30,9 @@ urlpatterns = [
     path('registration/council/delete/<int:registration_council_id>/', RegistrationCouncilController.delete_registration_council, name='delete_registration_council'),  # delete
 
     # ClinicMedicalRecordsController
-    path('medical-records/', DoctorRecordsController.get_medical_record, name='get_medical_records'),
+    path('medical-records/<int:doctor_id>/', DoctorRecordsController.get_medical_record, name='get_medical_records'),
     path('medical-records/create/', DoctorRecordsController.create_medical_record, name='create_medical_record'),
-    path('medical-records/update/<int:doctor_id>/', DoctorRecordsController.update_medical_record, name='update_medical_record'),
+    path('medical-records/update/', DoctorRecordsController.update_medical_record, name='update_medical_record'),
     path('medical-records/delete/<int:doctor_id>/', DoctorRecordsController.delete_medical_record, name='delete_medical_record'),
 ]
 

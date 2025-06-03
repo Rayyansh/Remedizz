@@ -123,9 +123,21 @@ class DoctorRequestSerializer(serializers.ModelSerializer):
 
 
 class DoctorRecordRequestSerializer(serializers.ModelSerializer):
+    doctor_id = serializers.PrimaryKeyRelatedField(
+        queryset=Doctor.objects.all(), write_only=True
+    )
+
     class Meta:
         model = DoctorMedicalRecords
         fields = [
             "doctor_id",
             "medical_document",
         ]
+
+class DoctorRecordUpdateItemSerializer(serializers.Serializer):
+    record_id = serializers.IntegerField()
+    medical_document = serializers.CharField()
+
+class DoctorRecordBulkUpdateRequestSerializer(serializers.Serializer):
+    doctor_id = serializers.IntegerField()
+    updates = DoctorRecordUpdateItemSerializer(many=True)

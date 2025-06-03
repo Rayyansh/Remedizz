@@ -13,7 +13,6 @@ class ClinicView(APIView):
     permission_classes = [IsAuthenticated, IsDigitalClinic]
 
 
-    @Common().exception_handler
     def get(self, request, digital_clinic_id=None):
         if digital_clinic_id:
             clinic = DigitalClinic.get_clinic_by_id(digital_clinic_id)
@@ -54,12 +53,20 @@ class ClinicMedicalRecordsView(APIView):
     permission_classes = [IsAuthenticated, IsDigitalClinic]
 
     @Common().exception_handler
-    def get(self, request, clinic_id=None):
-        digital_clinic_id = DigitalClinic.get_clinic_by_id(clinic_id)
-        record = DigitalClinicMedicalRecords.get_medical_records_by_clinic(digital_clinic_id)
-        if not record:
+    def get(self, request, digital_clinic_id=None):
+        digital_clinic_id = DigitalClinic.get_clinic_by_id(digital_clinic_id)
+        records = DigitalClinicMedicalRecords.get_medical_records_by_clinic(digital_clinic_id)
+        if not records:
             return Response({"error": "Medical record not found"}, status=status.HTTP_404_NOT_FOUND)
-        serializer = ClinicMedicalRecordResponseSerializer(record)
+
+        medical_documents = [{str(record.id): record.medical_document.url} for record in records]
+
+        grouped_data = {
+            "digital_clinic_id": digital_clinic_id.digital_clinic_id.id,
+            "medical_documents": medical_documents
+        }
+
+        serializer = ClinicMedicalRecordGroupedSerializer(grouped_data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @Common().exception_handler
@@ -77,16 +84,42 @@ class ClinicMedicalRecordsView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @Common().exception_handler
-    def put(self, request, clinic_id):
-        digital_clinic_id = DigitalClinic.get_clinic_by_id(clinic_id)
-        record = DigitalClinicMedicalRecords.get_medical_records_by_clinic(digital_clinic_id)
-        if not record:
-            return Response({"error": "Medical record not found"}, status=status.HTTP_404_NOT_FOUND)
-        serializer = ClinicMedicalRecordRequestSerializer(record, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(ClinicMedicalRecordResponseSerializer(record).data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def put(self, request):
+        serializer = ClinicRecordBulkUpdateRequestSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        clinic_id = serializer.validated_data["digital_clinic_id"]
+        updates = serializer.validated_data["updates"]
+
+        clinic = DigitalClinic.get_clinic_by_id(clinic_id)
+        if not clinic:
+            return Response({"error": "Clinic not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        updated_records = []
+
+        for item in updates:
+            record_id = item["record_id"]
+            medical_document = item["medical_document"]
+
+            record = DigitalClinicMedicalRecords.objects.filter(id=record_id, digital_clinic_id=clinic).first()
+            if not record:
+                continue
+
+            record.medical_document = medical_document
+            record.save()
+            updated_records.append(record)
+
+        response_serializer = ClinicMedicalRecordResponseSerializer(updated_records, many=True)
+        return Response(
+            {
+                "status": True,
+                "message": f"{len(updated_records)} record(s) updated successfully",
+                "data": response_serializer.data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
 
     @Common().exception_handler
     def delete(self, request, clinic_id):

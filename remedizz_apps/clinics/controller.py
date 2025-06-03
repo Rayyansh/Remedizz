@@ -89,8 +89,8 @@ class ClinicMedicalRecordsController:
     )
     @api_view(['PUT'])
     @permission_classes([IsAuthenticated, IsDigitalClinic])
-    def update_medical_record(request: Request, clinic_id: int) -> Response:
-        return ClinicMedicalRecordsView().put(request, clinic_id)
+    def update_medical_record(request: Request) -> Response:
+        return ClinicMedicalRecordsView().put(request)
 
     @staticmethod
     @extend_schema(
