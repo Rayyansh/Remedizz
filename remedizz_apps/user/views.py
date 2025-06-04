@@ -45,7 +45,6 @@ class UserAuthView(APIView):
                     elif role == "DigitalClinic":
                         DigitalClinic.objects.create(
                             digital_clinic_id=user,
-                            name=username
                         )
 
                     else:
