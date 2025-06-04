@@ -39,7 +39,6 @@ class UserAuthView(APIView):
                         # Providing default values for required fields
                         Doctor.objects.create(
                             doctor_id=user,
-                            name=username
                         )
 
                     elif role == "DigitalClinic":
