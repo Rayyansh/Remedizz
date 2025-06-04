@@ -4,7 +4,7 @@ from rest_framework.request import Request
 from drf_spectacular.utils import extend_schema
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from remedizz_apps.user.permissions import IsPatient
+from remedizz_apps.user.permissions import IsPatient, IsDoctorOrPatient
 
 from remedizz_apps.patients.views import PatientView, ChildPatientView
 from remedizz_apps.patients.serializers.request.patient_records_create import PatientRecordRequestSerializer
@@ -12,7 +12,7 @@ from remedizz_apps.patients.serializers.request.patient_create import PatientReq
 from remedizz_apps.patients.serializers.response.patient_get_all import PatientResponseSerializer
 from remedizz_apps.patients.serializers.request.child_patient_create import ChildPatientRequestSerializer
 from remedizz_apps.patients.serializers.response.child_patient_get_all import ChildPatientResponseSerializer
-from remedizz_apps.patients.serializers.response.get_patient_records import PatientRecordResponseSerializer
+from remedizz_apps.patients.serializers.response.patient_get_all import PatientRecordResponseSerializer
 from remedizz_apps.common.swagger import SwaggerPage
 
 
@@ -52,7 +52,7 @@ class PatientController:
         responses=SwaggerPage.response(description="Patient Record created successfully.")
     )
     @api_view(['POST'])
-    @permission_classes([IsPatient])
+    @permission_classes([IsDoctorOrPatient])
     def create_patient_record(request: Request) -> Response:
         return PatientView().create_patient_records(request)
 
@@ -61,7 +61,7 @@ class PatientController:
         responses=SwaggerPage.response(response=PatientRecordResponseSerializer(many=True))
     )
     @api_view(['GET'])
-    @permission_classes([IsPatient])
+    @permission_classes([IsDoctorOrPatient])
     def get_patient_records(request: Request) -> Response:
         return PatientView().get_patient_records(request)
 
@@ -71,7 +71,7 @@ class PatientController:
         responses=SwaggerPage.response(response=PatientRecordResponseSerializer)
     )
     @api_view(['PUT'])
-    @permission_classes([IsPatient])
+    @permission_classes([IsDoctorOrPatient])
     def update_patient_records(request: Request, record_id) -> Response:
         return PatientView().update_patient_records(request, record_id=record_id)
 
@@ -80,7 +80,7 @@ class PatientController:
         responses=SwaggerPage.response(description="Record deleted successfully.")
     )
     @api_view(['DELETE'])
-    @permission_classes([IsPatient])
+    @permission_classes([IsDoctorOrPatient])
     def delete_patient_records(request: Request, record_id) -> Response:
         return PatientView().delete_patient_records(request, record_id=record_id)
 

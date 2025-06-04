@@ -3,6 +3,8 @@ from remedizz_apps.patients.models import Patient, Records
 
 
 class PatientRecordResponseSerializer(serializers.ModelSerializer):
+    patient = serializers.CharField(source='patient.patient_id.id', read_only=True)
+
     class Meta:
         model = Records
         fields = '__all__'
