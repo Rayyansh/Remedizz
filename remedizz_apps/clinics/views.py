@@ -59,7 +59,10 @@ class ClinicMedicalRecordsView(APIView):
         if not records:
             return Response({"error": "Medical record not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        medical_documents = [{str(record.id): record.medical_document.url} for record in records]
+        medical_documents = [
+            {str(record.id): record.medical_document.url if record.medical_document else None}
+            for record in records
+        ]
 
         grouped_data = {
             "digital_clinic_id": digital_clinic_id.digital_clinic_id.id,
