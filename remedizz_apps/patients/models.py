@@ -104,12 +104,17 @@ class Records(models.Model):
         ('Prescription','Prescription'),
         ('Invoice','Invoice')
     ]
-    
+    ADDED_BY = [
+        ('Doctor','Doctor'),
+        ('Patient','Patient')
+    ]
 
 
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     record_type = models.CharField(max_length=30, choices=RECORD_TYPE)
     record_created_at = models.DateTimeField(default=timezone.now)
+    record_updated_at = models.DateTimeField(default=timezone.now)
+    added_by = models.CharField(max_length=30, choices=ADDED_BY, default='Patient')
     upload_record = models.ImageField(upload_to='patient_record/', max_length=50, null=True, blank=True)
 
     class Meta:

@@ -9,7 +9,7 @@ from remedizz_apps.patients.serializers.request.patient_records_create import Pa
 from remedizz_apps.patients.serializers.response.patient_get_all import PatientResponseSerializer
 from remedizz_apps.patients.serializers.request.child_patient_create import ChildPatientRequestSerializer
 from remedizz_apps.patients.serializers.response.child_patient_get_all import ChildPatientResponseSerializer
-from remedizz_apps.patients.serializers.response.get_patient_records import PatientRecordResponseSerializer
+from remedizz_apps.patients.serializers.response.patient_get_all import PatientRecordResponseSerializer
 from remedizz_apps.common.common import Common
 from remedizz_apps.user.permissions import IsPatient
 from remedizz_apps.user.authentication import JWTAuthentication
@@ -62,10 +62,16 @@ class PatientView(APIView):
         user, _ = JWTAuthentication().authenticate(request)
         patient = Patient.get_patient_by_id(user.id)
         request.data['patient'] = patient.pk
-
+        if hasattr(user, 'role'):
+            if user.role == "Doctor":
+                added_by_value = "Doctor"
+            else:
+                added_by_value = "Patient"
+        else:
+            added_by_value = "Patient"
         serializer = PatientRecordRequestSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(patient=patient, added_by=added_by_value)
             return Response({"message": "Patient Record created successfully."}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
