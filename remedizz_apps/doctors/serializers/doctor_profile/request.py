@@ -34,6 +34,9 @@ class RegistrationCouncilRequestSerializer(serializers.ModelSerializer):
 class DoctorRequestSerializer(serializers.ModelSerializer):
     education = EducationSerializer(many=True)
     work_experience = WorkExperienceSerializer(many=True)
+    doctor_contact_number = serializers.CharField(write_only=True, required=False)
+    
+
 
     class Meta:
         model = Doctor
@@ -52,8 +55,14 @@ class DoctorRequestSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         education_data = validated_data.pop("education", [])
         work_experience_data = validated_data.pop("work_experience", [])
+        contact_number = validated_data.pop("doctor_contact_number", None)
 
         doctor = Doctor.objects.create(**validated_data)
+
+        if contact_number:
+            user = doctor.doctor_id
+            user.phone_number = contact_number
+            user.save()
 
         for edu in education_data:
             edu_instance = Education.objects.create(**edu)
@@ -68,15 +77,22 @@ class DoctorRequestSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         education_data = validated_data.pop("education", [])
         work_experience_data = validated_data.pop("work_experience", [])
+        contact_number = validated_data.pop("doctor_contact_number", None)
 
         # === Update Doctor Fields ===
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
 
+        if contact_number:
+            user = instance.doctor_id
+            user.phone_number = contact_number
+            user.save()
+
         # === Update Education ===
         existing_edu_ids = [edu.id for edu in instance.education.all()]
         incoming_edu_ids = []
+
 
         for edu in education_data:
             edu_id = edu.get("id")

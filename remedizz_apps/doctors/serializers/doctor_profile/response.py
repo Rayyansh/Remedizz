@@ -15,7 +15,11 @@ class DoctorResponseSerializer(serializers.ModelSerializer):
     gender = serializers.SlugRelatedField(read_only=True, slug_field='gender_name')
     city = serializers.SlugRelatedField(read_only=True, slug_field='city_name')
     registration_council = serializers.SlugRelatedField(read_only=True, slug_field='registration_council_name')
+    doctor_contact_number = serializers.SerializerMethodField()
 
+    def get_doctor_contact_number(self, obj):
+        return obj.doctor_id.phone_number if obj.doctor_id else None
+    
     class Meta:
         model = Doctor
         fields = [

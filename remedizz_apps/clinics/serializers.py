@@ -10,6 +10,11 @@ from remedizz_apps.user.models import User
 
 
 class ClinicRequestSerializer(serializers.ModelSerializer):
+    specialization = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=DoctorSpecializations.objects.all(), required=False
+    )
+    clinic_type = serializers.ListField(child=serializers.CharField(max_length=50), required=False)
+
     # services = DigitalClinicServiceSerializer(many=True)
     phone_number = serializers.CharField(write_only=True, required=False)
     
@@ -21,27 +26,26 @@ class ClinicRequestSerializer(serializers.ModelSerializer):
         ]
 
     def update(self, instance, validated_data):
-        # services_data = validated_data.pop("services", [])
         phone_number = validated_data.pop("phone_number", None)
-
+        specialization_data = validated_data.pop("specialization", None)
+        clinic_type_data = validated_data.pop("clinic_type", None)
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
+
+        if specialization_data is not None:
+            instance.specialization.set(specialization_data)
+
+        if clinic_type_data is not None:
+            instance.clinic_type = clinic_type_data
+
         instance.save()
 
-        # Update related User fields
         user = instance.digital_clinic_id
-
         if phone_number:
             user.phone_number = phone_number
             user.username = phone_number
-        user.save()
-
-        # if services_data:
-        #     instance.services.clear()
-        #     for service in services_data:
-        #         service_instance, _ = DigitalClinicService.objects.get_or_create(**service)
-        #         instance.services.add(service_instance)
+            user.save()
 
         return instance
 

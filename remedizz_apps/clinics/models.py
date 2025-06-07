@@ -2,10 +2,11 @@ from django.db import models
 from remedizz_apps.user.models import User
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from remedizz_apps.specialization.models import DoctorSpecializations
+from django.contrib.postgres.fields import ArrayField
 
 class DigitalClinic(models.Model):
     digital_clinic_id = models.OneToOneField(User, on_delete=models.CASCADE, related_name="clinic_profile")
-    specialization = models.ForeignKey(DoctorSpecializations, on_delete=models.CASCADE, blank=True, null=True)
+    specialization = models.ManyToManyField("specialization.DoctorSpecializations", blank=True)
     available_service = models.CharField(max_length=20, null=True)
     operating_hours = models.CharField(max_length=20, null=True)
     username_validator = UnicodeUsernameValidator()
@@ -34,7 +35,11 @@ class DigitalClinic(models.Model):
         null=True
     )
 
-    clinic_type = models.CharField(max_length=30)
+    clinic_type = ArrayField(
+        models.CharField(max_length=50),
+        blank=True,
+        null=True
+    )
     address = models.TextField()
     website_url = models.URLField(null=True, blank=True)
     digital_clinic_email = models.EmailField(max_length=20, null=True, blank=True)
