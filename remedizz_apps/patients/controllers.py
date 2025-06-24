@@ -102,8 +102,8 @@ class ChildPatientController:
     )
     @api_view(['GET'])
     @permission_classes([IsPatient])
-    def get_children(request, child_id=None):
-        return ChildPatientView().get(request, child_id)
+    def get_children(request, member_id=None):
+        return ChildPatientView().get(request, member_id)
 
     @extend_schema(
         description="Update a child profile",

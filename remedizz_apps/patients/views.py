@@ -144,8 +144,9 @@ class ChildPatientView(APIView):
 
     @Common().exception_handler
     def put(self, request, member_id):
-        parent = request.user.patient_profile
-        child = ChildPatient.get_by_id(member_id, parent)
+        user, _ = JWTAuthentication().authenticate(request)
+        patient = Patient.get_patient_by_id(user.id)
+        child = ChildPatient.get_by_id(member_id, patient)
         if not child:
             return Response({"error": "Child patient not found."}, status=status.HTTP_404_NOT_FOUND)
 
