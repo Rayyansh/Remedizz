@@ -15,9 +15,9 @@ urlpatterns = [
 
     path('members/', ChildPatientController.create_child),
     path('members/all/', ChildPatientController.get_children),
-    path('members/<int:members_id>/', ChildPatientController.get_children),
-    path('members/update/<int:members_id>/', ChildPatientController.update_child),
-    path('members/delete/<int:members_id>/', ChildPatientController.delete_child),
+    path('members/<int:member_id>/', ChildPatientController.get_children),
+    path('members/update/<int:member_id>/', ChildPatientController.update_child),
+    path('members/delete/<int:member_id>/', ChildPatientController.delete_child),
 ]
 
 
