@@ -112,8 +112,8 @@ class ClinicPaymentInfoController:
     )
     @api_view(['GET'])
     @permission_classes([IsAuthenticated, IsDigitalClinic])
-    def get_payment_info(request: Request, digital_clinic_id: int) -> Response:
-        return ClinicPaymentInfoView().get(request, digital_clinic_id)
+    def get_payment_info(request: Request, clinic_id: int) -> Response:
+        return ClinicPaymentInfoView().get(request, clinic_id)
 
     @staticmethod
     @extend_schema(
@@ -134,8 +134,8 @@ class ClinicPaymentInfoController:
     )
     @api_view(['PUT'])
     @permission_classes([IsAuthenticated, IsDigitalClinic])
-    def update_payment_info(request: Request, digital_clinic_id: int) -> Response:
-        return ClinicPaymentInfoView().put(request, digital_clinic_id)
+    def update_payment_info(request: Request, clinic_id: int) -> Response:
+        return ClinicPaymentInfoView().put(request, clinic_id)
 
     @staticmethod
     @extend_schema(
@@ -144,5 +144,5 @@ class ClinicPaymentInfoController:
     )
     @api_view(['DELETE'])
     @permission_classes([IsAuthenticated, IsDigitalClinic])
-    def delete_payment_info(request: Request, digital_clinic_id: int) -> Response:
-        return ClinicPaymentInfoView().delete(request, digital_clinic_id)
+    def delete_payment_info(request: Request, clinic_id: int) -> Response:
+        return ClinicPaymentInfoView().delete(request, clinic_id)

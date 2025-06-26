@@ -42,7 +42,7 @@ class DigitalClinic(models.Model):
     )
     address = models.TextField()
     website_url = models.URLField(null=True, blank=True)
-    digital_clinic_email = models.EmailField(max_length=20, null=True, blank=True)
+    digital_clinic_email = models.EmailField(max_length=50, null=True, blank=True)
 
     terms_and_conditions_accepted = models.BooleanField(default=False) 
     clinic_profile_picture = models.ImageField(upload_to="clinic_profile_picture/", null=True, blank=True,
