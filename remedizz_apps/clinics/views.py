@@ -139,6 +139,7 @@ class ClinicPaymentInfoView(APIView):
 
     @Common().exception_handler
     def get(self, request, digital_clinic_id=None):
+        digital_clinic_id = DigitalClinic.get_clinic_by_id(digital_clinic_id)
         payment = DigitalClinicPaymentInformation.get_payment_info_by_clinic(digital_clinic_id)
         if not payment:
             return Response({"error": "Payment info not found"}, status=status.HTTP_404_NOT_FOUND)
@@ -155,6 +156,7 @@ class ClinicPaymentInfoView(APIView):
 
     @Common().exception_handler
     def put(self, request, digital_clinic_id):
+        digital_clinic_id = DigitalClinic.get_clinic_by_id(digital_clinic_id)
         payment = DigitalClinicPaymentInformation.get_payment_info_by_clinic(digital_clinic_id)
         if not payment:
             return Response({"error": "Payment info not found"}, status=status.HTTP_404_NOT_FOUND)
@@ -166,6 +168,7 @@ class ClinicPaymentInfoView(APIView):
 
     @Common().exception_handler
     def delete(self, request, digital_clinic_id):
+        digital_clinic_id = DigitalClinic.get_clinic_by_id(digital_clinic_id)        
         deleted, _ = DigitalClinicPaymentInformation.delete_payment_info(digital_clinic_id)
         if not deleted:
             return Response({"error": "Payment info not found"}, status=status.HTTP_404_NOT_FOUND)

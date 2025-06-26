@@ -8,7 +8,7 @@ urlpatterns = [
     path('delete/<int:digital_clinic_id>/', ClinicController.delete_clinic, name='delete_clinic'),
 
     # ClinicPaymentInfoController
-    path('payment-info/', ClinicPaymentInfoController.get_payment_info, name='get_payment_info'),
+    path('payment-info/<int:clinic_id>/', ClinicPaymentInfoController.get_payment_info, name='get_payment_info'),
     path('payment-info/create/', ClinicPaymentInfoController.create_payment_info, name='create_payment_info'),
     path('payment-info/update/<int:clinic_id>/', ClinicPaymentInfoController.update_payment_info, name='update_payment_info'),
     path('payment-info/delete/<int:clinic_id>/', ClinicPaymentInfoController.delete_payment_info, name='delete_payment_info'),
