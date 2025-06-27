@@ -76,7 +76,6 @@ class ClinicMedicalRecordsView(APIView):
     def post(self, request):
         user, _ = JWTAuthentication().authenticate(request)
         clinic = DigitalClinic.get_clinic_by_id(user.id)
-        print(clinic.pk)
         data = request.data.copy()
         data['digital_clinic_id'] = clinic.pk
 
@@ -147,11 +146,18 @@ class ClinicPaymentInfoView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @Common().exception_handler
-    def post(self, request, digital_clinic_id=None):
-        serializer = ClinicPaymentInfoRequestSerializer(data=request.data)
+    def post(self, request):
+    
+        user, _ = JWTAuthentication().authenticate(request)
+        clinic = DigitalClinic.get_clinic_by_id(user.id)
+        data = request.data.copy()
+        data['digital_clinic_id'] = clinic.pk
+
+        serializer = ClinicPaymentInfoRequestSerializer(data=data)
         if serializer.is_valid():
-            serializer.save(Digital_clinic_name_id=digital_clinic_id)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            instance = serializer.save()
+            response_serializer = ClinicPaymentInfoResponseSerializer(instance)
+            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @Common().exception_handler

@@ -123,8 +123,8 @@ class ClinicPaymentInfoController:
     )
     @api_view(['POST'])
     @permission_classes([IsAuthenticated, IsDigitalClinic])
-    def create_payment_info(request: Request, digital_clinic_id: int) -> Response:
-        return ClinicPaymentInfoView().post(request, digital_clinic_id)
+    def create_payment_info(request: Request) -> Response:
+        return ClinicPaymentInfoView().post(request)
 
     @staticmethod
     @extend_schema(

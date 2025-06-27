@@ -112,6 +112,8 @@ class ClinicPaymentInfoRequestSerializer(serializers.ModelSerializer):
         ]
 
 class ClinicPaymentInfoResponseSerializer(serializers.ModelSerializer):
+    digital_clinic_id = serializers.IntegerField(source="digital_clinic_id.digital_clinic_id.id", read_only=True)
+    
     class Meta:
         model = DigitalClinicPaymentInformation
         fields = [
