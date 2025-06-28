@@ -41,7 +41,7 @@ class DigitalClinic(models.Model):
         null=True
     )
     address = models.TextField()
-    website_url = models.URLField(null=True, blank=True)
+    website_url = models.CharField(null=True, blank=True)
     digital_clinic_email = models.EmailField(max_length=50, null=True, blank=True)
 
     terms_and_conditions_accepted = models.BooleanField(default=False) 
@@ -140,7 +140,7 @@ class DigitalClinicMedicalRecords(models.Model):
 class DigitalClinicPaymentInformation(models.Model):
     digital_clinic_id = models.ForeignKey(DigitalClinic, on_delete=models.CASCADE, related_name="payment_information")
     digital_clinic_bank_account_number = models.CharField(max_length=20)
-    ifsc_code = models.CharField(max_length=10)
+    ifsc_code = models.CharField(max_length=11)
     uoi_id = models.CharField(max_length=10)
 
     def __str__(self):
