@@ -106,6 +106,7 @@ class ClinicPaymentInfoRequestSerializer(serializers.ModelSerializer):
         model = DigitalClinicPaymentInformation
         fields = [
             "digital_clinic_id",
+            "digital_clinic_bank_account_name",
             "digital_clinic_bank_account_number",
             "ifsc_code",
             "uoi_id",
@@ -118,6 +119,7 @@ class ClinicPaymentInfoResponseSerializer(serializers.ModelSerializer):
         model = DigitalClinicPaymentInformation
         fields = [
             "digital_clinic_id",
+            "digital_clinic_bank_account_name",
             "digital_clinic_bank_account_number",
             "ifsc_code",
             "uoi_id",
