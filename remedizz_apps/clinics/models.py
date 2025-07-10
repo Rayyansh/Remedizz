@@ -1,6 +1,7 @@
 from django.db import models
 from remedizz_apps.user.models import User
 from django.contrib.auth.validators import UnicodeUsernameValidator
+from remedizz_apps.doctors.models.doctor import NameWithSpaceValidator
 from remedizz_apps.specialization.models import DoctorSpecializations
 from django.contrib.postgres.fields import ArrayField
 
@@ -16,7 +17,7 @@ class DigitalClinic(models.Model):
         help_text=(
             "Required. 20 characters or fewer. Letters, digits and @/./+/-/_ only."
         ),
-        validators=[username_validator],
+        validators=[NameWithSpaceValidator],
         error_messages={
             "unique": ("A user with that username already exists."),
         },

@@ -8,6 +8,14 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.utils import timezone
 
 # ======================================== REGISTRATION COUNCIL TABLE ================================================
+class NameWithSpaceValidator(UnicodeUsernameValidator):
+    regex = r"^[\w.@+\-\s]+\Z"  # Allow letters, digits, @ . + - _ and spaces
+    message = (
+        "Enter a valid name. This value may contain only letters, "
+        "numbers, spaces, and @/./+/-/_ characters."
+    )
+    flags = 0
+
 
 class RegistrationCouncil(models.Model):
     registration_council_name = models.CharField(max_length=255)
@@ -42,7 +50,7 @@ class Doctor(models.Model):
         help_text=(
             "Required. 20 characters or fewer. Letters, digits and @/./+/-/_ only."
         ),
-        validators=[username_validator],
+        validators=[NameWithSpaceValidator],
         error_messages={
             "unique": ("A user with that username already exists."),
         },
