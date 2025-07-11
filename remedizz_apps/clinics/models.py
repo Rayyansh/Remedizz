@@ -24,12 +24,12 @@ class DigitalClinic(models.Model):
         null=True
     )
     clinic_name = models.CharField(("username"),
-        max_length=20,
+        max_length=50,
         unique=True,
         help_text=(
             "Required. 20 characters or fewer. Letters, digits and @/./+/-/_ only."
         ),
-        validators=[username_validator],
+        validators=[NameWithSpaceValidator],
         error_messages={
             "unique": ("A user with that username already exists."),
         },
