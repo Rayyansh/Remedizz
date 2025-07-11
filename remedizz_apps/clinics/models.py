@@ -12,7 +12,7 @@ class DigitalClinic(models.Model):
     operating_hours = models.CharField(max_length=20, null=True)
     username_validator = UnicodeUsernameValidator()
     owner_name = models.CharField(("username"),
-        max_length=20,
+        max_length=50,
         unique=True,
         help_text=(
             "Required. 20 characters or fewer. Letters, digits and @/./+/-/_ only."

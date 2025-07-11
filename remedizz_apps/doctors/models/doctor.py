@@ -45,7 +45,7 @@ class Doctor(models.Model):
     doctor_id = models.OneToOneField(User, on_delete=models.CASCADE, related_name="doctor_profile")
     username_validator = UnicodeUsernameValidator()
     name = models.CharField(("username"),
-        max_length=20,
+        max_length=50,
         unique=True,
         help_text=(
             "Required. 20 characters or fewer. Letters, digits and @/./+/-/_ only."
