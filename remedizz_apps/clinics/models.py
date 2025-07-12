@@ -141,9 +141,9 @@ class DigitalClinicMedicalRecords(models.Model):
 class DigitalClinicPaymentInformation(models.Model):
     digital_clinic_id = models.ForeignKey(DigitalClinic, on_delete=models.CASCADE, related_name="payment_information")
     digital_clinic_bank_account_number = models.CharField(max_length=20)
-    digital_clinic_bank_account_name = models.CharField(max_length=20, null=True)
+    digital_clinic_bank_account_name = models.CharField(max_length=50, null=True)
     ifsc_code = models.CharField(max_length=11)
-    uoi_id = models.CharField(max_length=30)
+    uoi_id = models.CharField(max_length=50)
 
     def __str__(self):
         return self.digital_clinic_id.name
